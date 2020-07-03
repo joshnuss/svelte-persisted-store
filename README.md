@@ -1,6 +1,6 @@
 # svelte-local-storage-store
 
-A store that keeps data in local storage.
+A store that adds pub/sub to local storage.
 
 ## Installation
 
@@ -10,14 +10,13 @@ npm install svelte-local-storage-store
 
 ## Usage
 
-Define a store:
+Define the store:
 
 ```javascript
 import { writable } from 'svelte-local-storage-store'
 
-// `preferences` is the key, it will be:
-//  - Synced with localStorage
-//  - Accessible via pub/sub
+// First param `preferences` is the local storage key.
+// Second param is the initial value.
 export const preferences = writable('preferences', {
   theme: 'dark',
   pane: '50%',

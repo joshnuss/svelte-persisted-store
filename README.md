@@ -40,7 +40,6 @@ $preferences // read value with automatic subscription
 ## TODO
 
 - [ ] Support multiple tabs / capture event when localStorage changes
-- [ ] Support sapper, when no `process.browser` use initial value
 - [ ] Add tests
 
 ## License

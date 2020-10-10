@@ -7,12 +7,15 @@
   "scripts": {
     "build": "rollup -c",
     "prepublishOnly": "npm run build",
-    "lint": "eslint . --ext .js,.svelte"
+    "lint": "eslint . --ext .js,.svelte",
+    "test": "jest src",
+    "test:watch": "test -- --watch"
   },
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^6.0.0",
     "eslint": "^7.3.1",
     "eslint-plugin-svelte3": "^2.7.3",
+    "jest": "^26.5.2",
     "rollup": "^2.18.0",
     "rollup-plugin-svelte": "^5.0.0",
     "svelte": "^3.0.0"

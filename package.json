@@ -11,6 +11,12 @@
     "test": "jest src",
     "test:watch": "test -- --watch"
   },
+  "jest": {
+    "transform": {
+      "^.+\\.js$": "babel-jest"
+    },
+    "moduleFileExtensions": ["js"]
+  },
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^6.0.0",
     "babel-jest": "^26.5.2",

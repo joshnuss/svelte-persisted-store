@@ -2,9 +2,10 @@ module.exports = {
   env: {
     browser: true,
     es6: true,
-    node: true
+    node: true,
+    "jest/globals": true
   },
-  plugins: ['svelte3'],
+  plugins: ['svelte3', 'jest'],
   ignorePatterns: ['node_modules/', 'public/build'],
   extends: 'eslint:recommended',
   globals: {

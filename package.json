@@ -12,13 +12,18 @@
     "test:watch": "test -- --watch"
   },
   "jest": {
-    "testMatch": ["<rootDir>/test/*.test.js"],
+    "testMatch": [
+      "<rootDir>/test/*.test.js"
+    ],
     "transform": {
       "^.+\\.js$": "babel-jest"
     },
-    "moduleFileExtensions": ["js"]
+    "moduleFileExtensions": [
+      "js"
+    ]
   },
   "devDependencies": {
+    "@babel/preset-env": "^7.11.5",
     "@rollup/plugin-node-resolve": "^6.0.0",
     "babel-jest": "^26.5.2",
     "eslint": "^7.3.1",

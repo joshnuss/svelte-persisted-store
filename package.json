@@ -9,7 +9,7 @@
     "prepublishOnly": "npm run build",
     "lint": "eslint . --ext .js,.svelte",
     "test": "jest",
-    "test:watch": "test -- --watch"
+    "test:watch": "yarn run test -- --watch"
   },
   "jest": {
     "testMatch": [

@@ -40,7 +40,6 @@ $preferences // read value with automatic subscription
 ## TODO
 
 - [ ] Support multiple tabs / capture event when localStorage changes
-- [ ] Add tests
 
 ## License
 

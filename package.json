@@ -20,7 +20,8 @@
     },
     "moduleFileExtensions": [
       "js"
-    ]
+    ],
+    "setupFiles": ["jest-localstorage-mock"]
   },
   "devDependencies": {
     "@babel/preset-env": "^7.11.5",
@@ -30,6 +31,7 @@
     "eslint-plugin-jest": "^24.1.0",
     "eslint-plugin-svelte3": "^2.7.3",
     "jest": "^26.5.2",
+    "jest-localstorage-mock": "^2.4.3",
     "rollup": "^2.18.0",
     "rollup-plugin-svelte": "^5.0.0",
     "svelte": "^3.0.0"

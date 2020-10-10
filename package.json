@@ -12,6 +12,7 @@
     "test:watch": "test -- --watch"
   },
   "jest": {
+    "testMatch": ["<rootDir>/test/*.test.js"],
     "transform": {
       "^.+\\.js$": "babel-jest"
     },

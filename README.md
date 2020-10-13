@@ -39,7 +39,7 @@ $preferences // read value with automatic subscription
 
 ## TODO
 
-- [ ] Support multiple tabs / capture event when localStorage changes
+- [ ] Support changes that happen in a different tab using `window.onstorage` event
 - [ ] Consider supporting multiple stores using the same key
 
 ## License

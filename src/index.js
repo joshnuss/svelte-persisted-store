@@ -9,14 +9,23 @@ export function writable(key, initialValue) {
     set(JSON.parse(json))
   }
 
+  function updateStorage(key, value) {
+    if (typeof(localStorage) == 'undefined')
+      return
+
+    localStorage.setItem(key, JSON.stringify(value))
+  }
+
   return {
     set(value) {
-      typeof(localStorage) != 'undefined' ? localStorage.setItem(key, JSON.stringify(value)) : null
+      updateStorage(key, value)
       set(value)
     },
     update(cb) {
       const value = cb(get(store))
-      this.set(value)
+
+      updateStorage(key, value)
+      set(value)
     },
     subscribe
   }

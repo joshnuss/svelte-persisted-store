@@ -4,6 +4,7 @@
   "svelte": "src/index.js",
   "module": "dist/index.mjs",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "build": "rollup -c",
     "prepublishOnly": "npm run build",
@@ -24,7 +25,8 @@
   },
   "devDependencies": {
     "@babel/preset-env": "^7.11.5",
-    "@rollup/plugin-node-resolve": "^6.0.0",
+    "@rollup/plugin-node-resolve": "^11.0.0",
+    "@rollup/plugin-typescript": "^8.2.1",
     "babel-jest": "^26.5.2",
     "eslint": "^7.3.1",
     "eslint-plugin-jest": "^24.1.0",
@@ -32,7 +34,8 @@
     "jest": "^26.5.2",
     "rollup": "^2.18.0",
     "rollup-plugin-svelte": "^5.0.0",
-    "svelte": "^3.0.0"
+    "svelte": "^3.0.0",
+    "tslib": "^1.14.1"
   },
   "keywords": [
     "svelte"

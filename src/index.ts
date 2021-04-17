@@ -1,6 +1,6 @@
 import {writable as internal, get} from 'svelte/store'
 
-export function writable(key, initialValue) {
+export function writable<T>(key: string, initialValue: T) {
   const store = internal(initialValue)
   const {subscribe, set} = store
   const json = typeof(localStorage) != 'undefined' ? localStorage.getItem(key) : null
@@ -9,7 +9,7 @@ export function writable(key, initialValue) {
     set(JSON.parse(json))
   }
 
-  function updateStorage(key, value) {
+  function updateStorage(key: string, value: T) {
     if (typeof(localStorage) == 'undefined')
       return
 
@@ -17,11 +17,11 @@ export function writable(key, initialValue) {
   }
 
   return {
-    set(value) {
+    set(value: T) {
       updateStorage(key, value)
       set(value)
     },
-    update(cb) {
+    update(cb: Function) {
       const value = cb(get(store))
 
       updateStorage(key, value)

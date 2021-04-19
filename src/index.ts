@@ -1,6 +1,8 @@
-import {writable as internal, get} from 'svelte/store'
+import {writable as internal, get} from 'svelte/store';
+declare type Updater<T> = (value: T) => T;
 
 export function writable<T>(key: string, initialValue: T) {
+  
   const store = internal(initialValue)
   const {subscribe, set} = store
   const json = typeof(localStorage) != 'undefined' ? localStorage.getItem(key) : null
@@ -21,8 +23,8 @@ export function writable<T>(key: string, initialValue: T) {
       updateStorage(key, value)
       set(value)
     },
-    update(cb: Function) {
-      const value = cb(get(store))
+    update(updater: Updater<T>) {
+      const value = updater(get(store))
 
       updateStorage(key, value)
       set(value)

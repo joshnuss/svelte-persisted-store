@@ -1,47 +1,37 @@
 {
   "name": "svelte-local-storage-store",
   "version": "0.1.3",
-  "svelte": "src/index.js",
-  "module": "dist/index.mjs",
-  "main": "dist/index.js",
+  "main": "dist/index.ts",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "rollup -c",
-    "prepublishOnly": "npm run build",
-    "lint": "eslint . --ext .js,.svelte",
+    "build": "tsc",
+    "prepublishOnly": "npm test && npm run lint",
+    "prepare": "npm run build",
+    "lint": "eslint .",
     "test": "jest",
     "test:watch": "yarn run test -- --watch"
   },
-  "jest": {
-    "testMatch": [
-      "<rootDir>/test/*.test.js"
-    ],
-    "transform": {
-      "^.+\\.js$": "babel-jest"
-    },
-    "moduleFileExtensions": [
-      "js"
-    ]
-  },
   "devDependencies": {
-    "@babel/preset-env": "^7.11.5",
-    "@rollup/plugin-node-resolve": "^11.0.0",
-    "@rollup/plugin-typescript": "^8.2.1",
-    "babel-jest": "^26.5.2",
+    "@babel/core": "^7.13.16",
+    "@babel/preset-env": "^7.13.15",
+    "@types/jest": "^26.0.22",
+    "babel-jest": "^26.6.3",
     "eslint": "^7.3.1",
     "eslint-plugin-jest": "^24.1.0",
-    "eslint-plugin-svelte3": "^2.7.3",
-    "jest": "^26.5.2",
-    "rollup": "^2.18.0",
+    "jest": "^26.6.3",
     "rollup-plugin-svelte": "^5.0.0",
-    "svelte": "^3.0.0",
-    "tslib": "^1.14.1"
+    "ts-jest": "^26.5.5",
+    "typescript": "^4.2.4"
   },
   "keywords": [
     "svelte"
   ],
   "files": [
-    "src",
     "dist"
-  ]
+  ],
+  "dependencies": {
+    "@typescript-eslint/eslint-plugin": "^4.22.0",
+    "@typescript-eslint/parser": "^4.22.0",
+    "svelte": "^3.37.0"
+  }
 }

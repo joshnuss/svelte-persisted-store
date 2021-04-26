@@ -1,43 +1,18 @@
 module.exports = {
   env: {
     browser: true,
-    es6: true,
-    node: true,
-    'jest/globals': true
-  },
-  plugins: ['svelte3', 'jest'],
-  ignorePatterns: ['node_modules/', 'public/build'],
-  extends: 'eslint:recommended',
-  globals: {
-    Atomics: 'readonly',
-    SharedArrayBuffer: 'readonly'
-  },
-  parserOptions: {
-    ecmaVersion: 2019,
-    sourceType: 'module'
-  },
-  overrides: [
-    {
-      files: ['**/*.svelte'],
-      processor: 'svelte3/svelte3'
-    }
+    amd: true,
+    node: true
+},
+  root: true,
+  ignorePatterns: ["dist/"],
+  parser: "@typescript-eslint/parser",
+  plugins: [
+    "@typescript-eslint"
   ],
-  rules: {
-    indent: [
-      'error',
-      2
-    ],
-    'linebreak-style': [
-      'error',
-      'unix'
-    ],
-    quotes: [
-      'error',
-      'single'
-    ],
-    semi: [
-      'error',
-      'never'
-    ]
-  }
+  extends: [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended"
+  ]
 }

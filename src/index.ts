@@ -1,5 +1,5 @@
-import {writable as internal, get} from 'svelte/store';
-import { Writable } from 'svelte/store';
+import {writable as internal, get} from 'svelte/store'
+import { Writable } from 'svelte/store'
 declare type Updater<T> = (value: T) => T;
 
 export function writable<T>(key: string, initialValue: T): Writable<T> {

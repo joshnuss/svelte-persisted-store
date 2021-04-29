@@ -25,7 +25,7 @@ describe('writable()', () => {
     test('replaces old value', () => {
       localStorage.setItem('myKey', '"existing"')
 
-      const store = writable('myKey', "")
+      const store = writable('myKey', '')
       store.set('new-value')
       const value = get(store)
 
@@ -34,7 +34,7 @@ describe('writable()', () => {
     })
 
     test('adds new value', () => {
-      const store = writable('myKey', "")
+      const store = writable('myKey', '')
       store.set('new-value')
       const value = get(store)
 
@@ -69,8 +69,9 @@ describe('writable()', () => {
     it('publishes updates', () => {
       const store = writable('myKey', 123)
       const values: number[] = [] 
-      const unsub = store.subscribe(value => value!== undefined ? values.push(value) : values)
-
+      const unsub = store.subscribe((value : number) => {
+        if (value !== undefined) values.push(value)
+      })
       store.set(456)
       store.set(999)
 

@@ -4,13 +4,27 @@ declare type Updater<T> = (value: T) => T;
 
 export function writable<T>(key: string, initialValue: T): Writable<T> {
   
-  const store = internal(initialValue)
-  const {subscribe, set} = store
-  const json = typeof(localStorage) != 'undefined' ? localStorage.getItem(key) : null
+  const store = internal(initialValue, (set) => {
+    const browser = typeof(localStorage) != 'undefined'
+    const json = browser ? localStorage.getItem(key) : null
 
-  if (json) {
-    set(<T> JSON.parse(json))
-  }
+    if (json) {
+      set(<T> JSON.parse(json))
+    }
+
+    if (browser) {
+      const handleStorage = (event: StorageEvent) => {
+        if (event.key === key)
+          set(event.newValue ? JSON.parse(event.newValue) : null)
+      }
+
+      window.addEventListener("storage", handleStorage)
+
+      return () => window.removeEventListener("storage", handleStorage)
+    }
+  })
+
+  const {subscribe, set} = store
 
   function updateStorage(key: string, value: T) {
     if (typeof(localStorage) == 'undefined')

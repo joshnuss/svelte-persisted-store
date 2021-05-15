@@ -39,7 +39,7 @@ $preferences // read value with automatic subscription
 
 ## TODO
 
-- [ ] Support changes that happen in a different tab using `window.onstorage` event
+- [X] Support changes that happen in a different tab using `window.onstorage` event. Added in #11.
 - [ ] Consider supporting multiple stores using the same key
 
 ## License

@@ -1,6 +1,6 @@
 # svelte-local-storage-store
 
-A store that adds pub/sub to local storage.
+A store that adds pub/sub to local storage. Supports changes across multiple tabs.
 
 ## Installation
 

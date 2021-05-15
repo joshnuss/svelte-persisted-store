@@ -1,6 +1,6 @@
 {
   "name": "svelte-local-storage-store",
-  "version": "0.1.6",
+  "version": "0.2.0",
   "main": "dist/index.js",
   "types": "dist/index.d.js",
   "scripts": {

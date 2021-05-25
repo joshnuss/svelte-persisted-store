@@ -1,4 +1,4 @@
-import { writable } from '../src/index'
+import { writable } from '../index'
 import { get } from 'svelte/store'
 
 beforeEach(() => localStorage.clear())

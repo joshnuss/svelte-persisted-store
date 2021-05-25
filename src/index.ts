@@ -3,9 +3,9 @@ import { Writable } from 'svelte/store'
 declare type Updater<T> = (value: T) => T;
 
 export function writable<T>(key: string, initialValue: T): Writable<T> {
-  
+  const browser = typeof(localStorage) != 'undefined'
+
   const store = internal(initialValue, (set) => {
-    const browser = typeof(localStorage) != 'undefined'
     const json = browser ? localStorage.getItem(key) : null
 
     if (json) {
@@ -27,8 +27,7 @@ export function writable<T>(key: string, initialValue: T): Writable<T> {
   const {subscribe, set} = store
 
   function updateStorage(key: string, value: T) {
-    if (typeof(localStorage) == 'undefined')
-      return
+    if (!browser) return
 
     localStorage.setItem(key, JSON.stringify(value))
   }

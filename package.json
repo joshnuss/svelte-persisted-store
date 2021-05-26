@@ -8,7 +8,7 @@
     "node": ">=0.14"
   },
   "scripts": {
-    "build": "tsup index.ts --external svelte --format esm,cjs",
+    "build": "tsup index.ts --format esm,cjs --sourcemap --dts",
     "prepublishOnly": "npm test && npm run lint",
     "prepare": "npm run build",
     "lint": "eslint .",
@@ -29,7 +29,8 @@
     "rollup-plugin-svelte": "^5.0.0",
     "ts-jest": "^26.5.5",
     "tsup": "^4.11.1",
-    "typescript": "^4.2.4"
+    "typescript": "^4.2.4",
+    "svelte": "^3.38.2"
   },
   "keywords": [
     "svelte"
@@ -38,9 +39,6 @@
     "dist"
   ],
   "peerDependencies": {
-    "svelte": "^3.38.2"
-  },
-  "dependencies": {
     "svelte": "^3.38.2"
   }
 }

@@ -3,6 +3,7 @@
   "version": "0.2.0",
   "main": "dist/index.js",
   "types": "dist/index.d.js",
+  "engines" : { "node" : ">=0.14" },
   "scripts": {
     "build": "tsc",
     "prepublishOnly": "npm test && npm run lint",

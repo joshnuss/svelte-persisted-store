@@ -1,9 +1,11 @@
 {
   "name": "svelte-local-storage-store",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "main": "dist/index.js",
   "types": "dist/index.d.js",
-  "engines" : { "node" : ">=0.14" },
+  "engines": {
+    "node": ">=0.14"
+  },
   "scripts": {
     "build": "tsc",
     "prepublishOnly": "npm test && npm run lint",

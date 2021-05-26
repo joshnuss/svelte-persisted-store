@@ -1,30 +1,13 @@
-import {writable as internal, get} from 'svelte/store'
-import { Writable } from 'svelte/store'
+import {writable as internal, Writable} from 'svelte/store'
+import {get} from 'svelte/store'
+
 declare type Updater<T> = (value: T) => T;
+declare type StoreDict = { [key: string]: any }
+
+const stores: StoreDict = {}
 
 export function writable<T>(key: string, initialValue: T): Writable<T> {
   const browser = typeof(localStorage) != 'undefined'
-
-  const store = internal(initialValue, (set) => {
-    const json = browser ? localStorage.getItem(key) : null
-
-    if (json) {
-      set(<T> JSON.parse(json))
-    }
-
-    if (browser) {
-      const handleStorage = (event: StorageEvent) => {
-        if (event.key === key)
-          set(event.newValue ? JSON.parse(event.newValue) : null)
-      }
-
-      window.addEventListener("storage", handleStorage)
-
-      return () => window.removeEventListener("storage", handleStorage)
-    }
-  })
-
-  const {subscribe, set} = store
 
   function updateStorage(key: string, value: T) {
     if (!browser) return
@@ -32,17 +15,42 @@ export function writable<T>(key: string, initialValue: T): Writable<T> {
     localStorage.setItem(key, JSON.stringify(value))
   }
 
-  return {
-    set(value: T) {
-      updateStorage(key, value)
-      set(value)
-    },
-    update(updater: Updater<T>) {
-      const value = updater(get(store))
+  if (!stores[key]) {
+    const store = internal(initialValue, (set) => {
+      const json = browser ? localStorage.getItem(key) : null
 
-      updateStorage(key, value)
-      set(value)
-    },
-    subscribe
+      if (json) {
+        set(<T> JSON.parse(json))
+      }
+
+      if (browser) {
+        const handleStorage = (event: StorageEvent) => {
+          if (event.key === key)
+            set(event.newValue ? JSON.parse(event.newValue) : null)
+        }
+
+        window.addEventListener("storage", handleStorage)
+
+        return () => window.removeEventListener("storage", handleStorage)
+      }
+    })
+
+    const {subscribe, set} = store
+
+    stores[key] = {
+      set(value: T) {
+        updateStorage(key, value)
+        set(value)
+      },
+      update(updater: Updater<T>) {
+        const value = updater(get(store))
+
+        updateStorage(key, value)
+        set(value)
+      },
+      subscribe
+    }
   }
+
+  return stores[key]
 }

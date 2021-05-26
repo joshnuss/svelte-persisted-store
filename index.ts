@@ -1,8 +1,7 @@
-import {writable as internal, Writable} from 'svelte/store'
-import {get} from 'svelte/store'
+import {writable as internal, get, Writable} from 'svelte/store'
 
 declare type Updater<T> = (value: T) => T;
-declare type StoreDict = { [key: string]: any }
+declare type StoreDict = { [key: string]: Writable<any> }
 
 const stores: StoreDict = {}
 

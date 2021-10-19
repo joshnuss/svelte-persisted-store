@@ -7,6 +7,10 @@
   "engines": {
     "node": ">=0.14"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/joshnuss/svelte-local-storage-store.git"
+  },
   "scripts": {
     "build": "tsup index.ts --format esm,cjs --sourcemap --dts",
     "prepublishOnly": "npm test && npm run lint",

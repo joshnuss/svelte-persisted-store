@@ -1,6 +1,6 @@
 {
   "name": "svelte-local-storage-store",
-  "version": "0.2.4",
+  "version": "0.0.0-development",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
@@ -17,7 +17,8 @@
     "prepare": "npm run build",
     "lint": "eslint .",
     "fix": "eslint . --fix",
-    "test": "jest",
+    "semantic-release": "semantic-release",
+    "test": "jest --coverage",
     "test:watch": "yarn run test -- --watch"
   },
   "devDependencies": {
@@ -27,14 +28,16 @@
     "@typescript-eslint/eslint-plugin": "^4.22.0",
     "@typescript-eslint/parser": "^4.22.0",
     "babel-jest": "^26.6.3",
+    "codecov": "^3.8.3",
     "eslint": "^7.3.1",
     "eslint-plugin-jest": "^24.1.0",
     "jest": "^26.6.3",
     "rollup-plugin-svelte": "^5.0.0",
+    "semantic-release": "18.0.0",
+    "svelte": "^3.38.2",
     "ts-jest": "^26.5.5",
     "tsup": "^4.11.1",
-    "typescript": "^4.2.4",
-    "svelte": "^3.38.2"
+    "typescript": "^4.2.4"
   },
   "keywords": [
     "svelte"

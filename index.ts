@@ -3,6 +3,7 @@ import {writable as internal, get, Writable} from 'svelte/store'
 declare type Updater<T> = (value: T) => T;
 declare type StoreDict<T> = { [key: string]: Writable<T> }
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 const stores: StoreDict<any> = {}
 
 export function writable<T>(key: string, initialValue: T): Writable<T> {

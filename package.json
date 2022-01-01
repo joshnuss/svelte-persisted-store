@@ -32,7 +32,7 @@
     "codecov": "^3.8.3",
     "eslint": "^8.3.0",
     "eslint-plugin-jest": "^25.2.4",
-    "jest": "^27.4.3",
+    "jest": "^27.4.5",
     "rollup-plugin-svelte": "^7.1.0",
     "semantic-release": "18.0.1",
     "svelte": "^3.44.2",

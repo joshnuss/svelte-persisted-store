@@ -19,15 +19,28 @@ import { writable } from 'svelte-local-storage-store'
 
 // First param `preferences` is the local storage key.
 // Second param is the initial value.
+// Third param optional fromJSON handler
+// Forth param optional toJSON handler
 export const preferences = writable('preferences', {
-  theme: 'dark',
-  pane: '50%',
-  ...
-})
+    theme: 'dark',
+    pane: '50%',
+    ...
+  },
+  (json) => {
+    // used for anything that needs to be converted
+    // from JSON to JS values like Dates
+    return { theme: json.dark, pane: json.pane, ... }
+  },
+  (preferences) => {
+    // used for anything that needs to be manually
+    // converted to JSON
+    return { theme: preferences.dark, pane: preferences.pane, ... }
+  }
+)
 ```
 
 Then when you want to use the store:
-  
+
 ```javascript
 import { get } from 'svelte/store'
 import { preferences } from './stores'

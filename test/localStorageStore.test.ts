@@ -178,4 +178,36 @@ describe('writable()', () => {
       unsub()
     })
   })
+
+  describe('to/from JSON', () => {
+    interface Entity {
+      date: Date;
+    }
+    interface EntityJSON {
+      date: string;
+    }
+
+    function toJSON(entity: Entity): EntityJSON {
+      return {
+        date: entity.date.toJSON()
+      }
+    } 
+
+    function fromJSON(entity: EntityJSON): Entity {
+      return {
+        date: new Date(entity.date)
+      }
+    } 
+
+    it('uses to/from JSON to convert value before setting', () => {
+      const store = writable<Entity>('myKey11', { date: new Date('2020-01-01') }, fromJSON, toJSON)
+
+      const initial = get(store)
+      store.set({ date: new Date('2021-01-01') })
+      const current = get(store)
+
+      expect(initial).toEqual({ date: new Date('2020-01-01') })
+      expect(current).toEqual({ date: new Date('2021-01-01') })
+    })
+  })
 })

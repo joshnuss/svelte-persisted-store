@@ -34,7 +34,7 @@
     "eslint-plugin-jest": "^25.2.4",
     "jest": "^27.5.1",
     "rollup-plugin-svelte": "^7.1.0",
-    "semantic-release": "18.0.1",
+    "semantic-release": "19.0.3",
     "svelte": "^3.48.0",
     "ts-jest": "^27.0.7",
     "tsup": "^5.10.0",

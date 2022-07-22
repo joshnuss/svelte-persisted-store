@@ -6,13 +6,15 @@ declare type StoreDict<T> = { [key: string]: Writable<T> }
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const stores: StoreDict<any> = {}
 
-export function writable<T>(key: string, initialValue: T): Writable<T> {
+export function writable<T>(key: string, initialValue: T, options?: { serialize?: (value: T) => string, deserialize?: (s: string) => T }): Writable<T> {
   const browser = typeof(localStorage) != 'undefined'
+  const serialize = options?.serialize || JSON.stringify
+  const deserialize = options?.deserialize || JSON.parse
 
   function updateStorage(key: string, value: T) {
     if (!browser) return
 
-    localStorage.setItem(key, JSON.stringify(value))
+    localStorage.setItem(key, serialize(value))
   }
 
   if (!stores[key]) {
@@ -20,13 +22,13 @@ export function writable<T>(key: string, initialValue: T): Writable<T> {
       const json = browser ? localStorage.getItem(key) : null
 
       if (json) {
-        set(<T> JSON.parse(json))
+        set(<T>deserialize(json))
       }
 
       if (browser) {
         const handleStorage = (event: StorageEvent) => {
           if (event.key === key)
-            set(event.newValue ? JSON.parse(event.newValue) : null)
+            set(event.newValue ? deserialize(event.newValue) : null)
         }
 
         window.addEventListener("storage", handleStorage)

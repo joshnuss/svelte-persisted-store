@@ -180,16 +180,19 @@ describe('writable()', () => {
   })
 
   it('allows custom serialize/deserialize functions', () => {
-    const serializer = JSON
+    const serializer = {
+      stringify: (set: Set<number>) => JSON.stringify(Array.from(set)),
+      parse: (json: string) => new Set(JSON.parse(json)),
+    }
 
-    const s = new Set([1, 2, 3])
+    const testSet = new Set([1, 2, 3])
 
-    const store = writable('myKey11', s, { serializer })
+    const store = writable('myKey11', testSet, { serializer })
     const value = get(store)
 
     store.update(d => d.add(4))
 
-    expect(value).toEqual(s)
-    expect(localStorage.myKey11).toEqual(serializer.stringify(s))
+    expect(value).toEqual(testSet)
+    expect(localStorage.myKey11).toEqual(serializer.stringify(testSet))
   })
 })

@@ -16,7 +16,7 @@ interface Options<T> {
 }
 
 export function writable<T>(key: string, initialValue: T, options?: Options<T>): Writable<T> {
-  const browser = typeof(localStorage) != 'undefined'
+  const browser = typeof(localStorage) != 'undefined' && typeof(window) != 'undefined'
   const serializer = options?.serializer || JSON
 
   function updateStorage(key: string, value: T) {

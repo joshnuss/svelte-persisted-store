@@ -209,7 +209,6 @@ describe('writable()', () => {
       })
 
       store.set('bar')  
-      console.log(sessionStorage)
 
       expect(window.sessionStorage.setItem).toHaveBeenCalled()  
   })

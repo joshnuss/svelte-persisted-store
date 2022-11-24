@@ -195,4 +195,22 @@ describe('writable()', () => {
     expect(value).toEqual(testSet)
     expect(localStorage.myKey11).toEqual(serializer.stringify(testSet))
   })
+
+  it('lets you switch storage type', () => {
+      jest.spyOn(Object.getPrototypeOf(window.sessionStorage), 'setItem')
+      Object.setPrototypeOf(window.sessionStorage.setItem, jest.fn())
+
+      const value = 'foo'
+
+      const store = writable('myKey12', value, {
+        storage: {
+          type: 'session'
+        }
+      })
+
+      store.set('bar')  
+      console.log(sessionStorage)
+
+      expect(window.sessionStorage.setItem).toHaveBeenCalled()  
+  })
 })

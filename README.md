@@ -39,6 +39,21 @@ get(preferences) // read value
 $preferences // read value with automatic subscription
 ```
 
+Change serializer or storage type: 
+
+```javascript
+import { writable } from 'svelte-local-storage-store'
+import * as devalue from 'devalue';
+
+// Third parameter is options.
+export const preferences = writable('preferences', 'foo', {
+  serializer: devalue // defaults to JSON
+  storage: {
+    type: 'session' // set to 'session' for sessionStorage, defaults to 'local'
+  }
+})
+```
+
 ## License
 
 MIT

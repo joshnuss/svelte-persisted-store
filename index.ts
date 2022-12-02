@@ -15,9 +15,7 @@ type StorageType = 'local' | 'session'
 
 interface Options<T> {
   serializer?: Serializer<T>
-  storage?: {
-    type?: StorageType
-  }
+  storage?: StorageType
 }
 
 function getStorage(type: StorageType) {
@@ -26,7 +24,7 @@ function getStorage(type: StorageType) {
 
 export function writable<T>(key: string, initialValue: T, options?: Options<T>): Writable<T> {
   const serializer = options?.serializer ?? JSON
-  const storageType = options?.storage?.type ?? 'local'
+  const storageType = options?.storage ?? 'local'
   const browser = typeof(window) !== 'undefined' && typeof(document) !== 'undefined'
 
   function updateStorage(key: string, value: T) {

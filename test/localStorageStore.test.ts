@@ -203,9 +203,7 @@ describe('writable()', () => {
       const value = 'foo'
 
       const store = writable('myKey12', value, {
-        storage: {
-          type: 'session'
-        }
+        storage: 'session'
       })
 
       store.set('bar')  

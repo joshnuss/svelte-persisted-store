@@ -48,9 +48,7 @@ import * as devalue from 'devalue';
 // Third parameter is options.
 export const preferences = writable('preferences', 'foo', {
   serializer: devalue // defaults to JSON
-  storage: {
-    type: 'session' // set to 'session' for sessionStorage, defaults to 'local'
-  }
+  storage: 'session' // set to 'session' for sessionStorage, defaults to 'local'
 })
 ```
 

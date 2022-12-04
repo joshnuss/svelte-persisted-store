@@ -27,7 +27,7 @@ export const preferences = writable('preferences', {
 ```
 
 Then when you want to use the store:
-  
+
 ```javascript
 import { get } from 'svelte/store'
 import { preferences } from './stores'
@@ -39,16 +39,15 @@ get(preferences) // read value
 $preferences // read value with automatic subscription
 ```
 
-Change serializer or storage type: 
+You can also optionally set the `serializer` or `storage` type:
 
 ```javascript
-import { writable } from 'svelte-local-storage-store'
-import * as devalue from 'devalue';
+import * as devalue from 'devalue'
 
-// Third parameter is options.
-export const preferences = writable('preferences', 'foo', {
-  serializer: devalue // defaults to JSON
-  storage: 'session' // set to 'session' for sessionStorage, defaults to 'local'
+// third parameter is options.
+export const preferences = writable('local-storage-key', 'default-value', {
+  serializer: devalue // defaults to `JSON`
+  storage: 'session' // 'session' for sessionStorage, defaults to 'local'
 })
 ```
 

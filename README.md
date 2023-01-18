@@ -15,11 +15,11 @@ npm install svelte-local-storage-store
 Define the store:
 
 ```javascript
-import { writable } from 'svelte-local-storage-store'
+import { persisted } from 'svelte-local-storage-store'
 
 // First param `preferences` is the local storage key.
 // Second param is the initial value.
-export const preferences = writable('preferences', {
+export const preferences = persisted('preferences', {
   theme: 'dark',
   pane: '50%',
   ...
@@ -45,7 +45,7 @@ You can also optionally set the `serializer` or `storage` type:
 import * as devalue from 'devalue'
 
 // third parameter is options.
-export const preferences = writable('local-storage-key', 'default-value', {
+export const preferences = persisted('local-storage-key', 'default-value', {
   serializer: devalue, // defaults to `JSON`
   storage: 'session' // 'session' for sessionStorage, defaults to 'local'
 })

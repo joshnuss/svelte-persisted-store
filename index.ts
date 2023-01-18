@@ -23,6 +23,10 @@ function getStorage(type: StorageType) {
 }
 
 export function writable<T>(key: string, initialValue: T, options?: Options<T>): Writable<T> {
+  console.warn("writable() has been deprecated. Please use persisted() instead.\n\nchange:\n\nimport { writable } from 'svelte-local-storage-store'\n\nto:\n\nimport { persisted } from 'svelte-local-storage-store'")
+  return persisted<T>(key, initialValue, options)
+}
+export function persisted<T>(key: string, initialValue: T, options?: Options<T>): Writable<T> {
   const serializer = options?.serializer ?? JSON
   const storageType = options?.storage ?? 'local'
   const browser = typeof(window) !== 'undefined' && typeof(document) !== 'undefined'

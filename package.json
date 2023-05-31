@@ -47,6 +47,6 @@
     "dist"
   ],
   "peerDependencies": {
-    "svelte": "^3.48.0"
+    "svelte": "^3.48.0 || ^4.0.0"
   }
 }

@@ -23,6 +23,7 @@ describe('persisted()', () => {
     const value = get(store)
 
     expect(value).toEqual(123)
+    expect(localStorage.myKey).toEqual('123')
   })
 
   test('uses existing value if data already in local storage', () => {
@@ -207,7 +208,7 @@ describe('persisted()', () => {
     store.update(d => d.add(4))
 
     expect(value).toEqual(testSet)
-    expect(localStorage.myKey11).toEqual(serializer.stringify(testSet))
+    expect(localStorage.myKey11).toEqual(serializer.stringify(new Set([1,2,3,4])))
   })
 
   it('lets you switch storage type', () => {

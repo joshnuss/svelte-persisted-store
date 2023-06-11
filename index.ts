@@ -30,19 +30,20 @@ export function persisted<T>(key: string, initialValue: T, options?: Options<T>)
   const serializer = options?.serializer ?? JSON
   const storageType = options?.storage ?? 'local'
   const browser = typeof(window) !== 'undefined' && typeof(document) !== 'undefined'
+  const storage = browser ? getStorage(storageType) : null
 
   function updateStorage(key: string, value: T) {
-    if (!browser) return
-
-    getStorage(storageType).setItem(key, serializer.stringify(value))
+    storage?.setItem(key, serializer.stringify(value))
   }
 
   if (!stores[key]) {
     const store = internal(initialValue, (set) => {
-      const json = browser ? getStorage(storageType).getItem(key) : null
+      const json = storage?.getItem(key)
 
       if (json) {
         set(<T>serializer.parse(json))
+      } else {
+        updateStorage(key, initialValue)
       }
 
       if (browser) {

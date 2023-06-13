@@ -1,4 +1,4 @@
-import {writable as internal, Writable} from 'svelte/store'
+import {writable as internal, type Writable} from 'svelte/store'
 
 declare type Updater<T> = (value: T) => T;
 declare type StoreDict<T> = { [key: string]: Writable<T> }

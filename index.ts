@@ -1,4 +1,4 @@
-import {writable as internal, get, Writable} from 'svelte/store'
+import {writable as internal, Writable} from 'svelte/store'
 
 declare type Updater<T> = (value: T) => T;
 declare type StoreDict<T> = { [key: string]: Writable<T> }
@@ -65,11 +65,14 @@ export function persisted<T>(key: string, initialValue: T, options?: Options<T>)
         updateStorage(key, value)
         set(value)
       },
-      update(updater: Updater<T>) {
-        const value = updater(get(store))
+      update(callback: Updater<T>) {
+        return store.update((last) => {
+          const value = callback(last)
 
-        updateStorage(key, value)
-        set(value)
+          updateStorage(key, value)
+
+          return value
+        })
       },
       subscribe
     }

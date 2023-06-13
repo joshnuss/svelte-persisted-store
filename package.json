@@ -17,7 +17,7 @@
     "prepublishOnly": "npm test && npm run lint",
     "prepare": "npm run build",
     "lint": "eslint .",
-    "fix": "eslint . --fix",
+    "format": "eslint . --fix",
     "semantic-release": "semantic-release",
     "test": "vitest --coverage",
     "test:watch": "yarn run test -- --watch"

@@ -5,7 +5,7 @@ beforeEach(() => localStorage.clear())
 
 describe('writable()', () => {
   test('it works, but raises deprecation warning', () => {
-    console.warn = jest.fn()
+    console.warn = vi.fn()
 
     localStorage.setItem('myKey2', '"existing"')
 
@@ -210,8 +210,8 @@ describe('persisted()', () => {
   })
 
   it('lets you switch storage type', () => {
-      jest.spyOn(Object.getPrototypeOf(window.sessionStorage), 'setItem')
-      Object.setPrototypeOf(window.sessionStorage.setItem, jest.fn())
+      vi.spyOn(Object.getPrototypeOf(window.sessionStorage), 'setItem')
+      Object.setPrototypeOf(window.sessionStorage.setItem, vi.fn())
 
       const value = 'foo'
 

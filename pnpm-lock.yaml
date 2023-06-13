@@ -1,7 +1,7 @@
 lockfileVersion: '6.0'
 
 settings:
-  autoInstallPeers: true
+  autoInstallPeers: false
   excludeLinksFromLockfile: false
 
 devDependencies:
@@ -29,6 +29,9 @@ devDependencies:
   jsdom:
     specifier: ^22.1.0
     version: 22.1.0
+  rollup:
+    specifier: ^3.25.1
+    version: 3.25.1
   rollup-plugin-svelte:
     specifier: ^7.1.0
     version: 7.1.0(rollup@3.25.1)(svelte@3.49.0)

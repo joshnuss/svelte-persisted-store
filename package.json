@@ -19,8 +19,7 @@
     "lint": "eslint .",
     "format": "eslint . --fix",
     "semantic-release": "semantic-release",
-    "test": "vitest --coverage",
-    "test:watch": "yarn run test -- --watch"
+    "test": "vitest --coverage"
   },
   "devDependencies": {
     "@babel/core": "^7.21.0",

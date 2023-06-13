@@ -1,20 +1,35 @@
-import { writable } from '../index'
+import { persisted, writable } from '../index'
 import { get } from 'svelte/store'
 
 beforeEach(() => localStorage.clear())
 
 describe('writable()', () => {
+  test('it works, but raises deprecation warning', () => {
+    console.warn = vi.fn()
+
+    localStorage.setItem('myKey2', '"existing"')
+
+    const store = writable('myKey2', 'initial')
+    const value = get(store)
+
+    expect(value).toEqual('existing')
+    expect(console.warn).toHaveBeenCalledWith(expect.stringMatching(/deprecated/))
+  })
+})
+
+describe('persisted()', () => {
   test('uses initial value if nothing in local storage', () => {
-    const store = writable('myKey', 123)
+    const store = persisted('myKey', 123)
     const value = get(store)
 
     expect(value).toEqual(123)
+    expect(localStorage.myKey).toEqual('123')
   })
 
   test('uses existing value if data already in local storage', () => {
     localStorage.setItem('myKey2', '"existing"')
 
-    const store = writable('myKey2', 'initial')
+    const store = persisted('myKey2', 'initial')
     const value = get(store)
 
     expect(value).toEqual('existing')
@@ -24,7 +39,7 @@ describe('writable()', () => {
     test('replaces old value', () => {
       localStorage.setItem('myKey3', '"existing"')
 
-      const store = writable('myKey3', '')
+      const store = persisted('myKey3', '')
       store.set('new-value')
       const value = get(store)
 
@@ -33,7 +48,7 @@ describe('writable()', () => {
     })
 
     test('adds new value', () => {
-      const store = writable('myKey4', '')
+      const store = persisted('myKey4', '')
       store.set('new-value')
       const value = get(store)
 
@@ -44,9 +59,7 @@ describe('writable()', () => {
 
   describe('update()', () => {
     test('replaces old value', () => {
-      localStorage.setItem('myKey5', '123')
-
-      const store = writable('myKey5', 0)
+      const store = persisted('myKey5', 123)
       store.update(n => n + 1)
       const value = get(store)
 
@@ -55,7 +68,7 @@ describe('writable()', () => {
     })
 
     test('adds new value', () => {
-      const store = writable('myKey6', 123)
+      const store = persisted('myKey6', 123)
       store.update(n => n + 1)
       const value = get(store)
 
@@ -66,7 +79,7 @@ describe('writable()', () => {
 
   describe('subscribe()', () => {
     it('publishes updates', () => {
-      const store = writable('myKey7', 123)
+      const store = persisted('myKey7', 123)
       const values: number[] = []
       const unsub = store.subscribe((value : number) => {
         if (value !== undefined) values.push(value)
@@ -81,7 +94,7 @@ describe('writable()', () => {
   })
 
   it('handles duplicate stores with the same key', () => {
-    const store1 = writable('same-key', 1)
+    const store1 = persisted('same-key', 1)
     const values1: number[] = []
 
     const unsub1 = store1.subscribe(value => {
@@ -90,7 +103,7 @@ describe('writable()', () => {
 
     store1.set(2)
 
-    const store2 = writable('same-key', 99)
+    const store2 = persisted('same-key', 99)
     const values2: number[] = []
 
     const unsub2 = store2.subscribe(value => {
@@ -114,7 +127,7 @@ describe('writable()', () => {
     type NumberDict = { [key: string] : number }
 
     it('sets storage when key matches', () => {
-      const store = writable('myKey8', {a: 1})
+      const store = persisted('myKey8', {a: 1})
       const values: NumberDict[] = []
 
       const unsub = store.subscribe((value: NumberDict) => {
@@ -130,7 +143,7 @@ describe('writable()', () => {
     })
 
     it('sets store to null when value is null', () => {
-      const store = writable('myKey9', {a: 1})
+      const store = persisted('myKey9', {a: 1})
       const values: NumberDict[] = []
 
       const unsub = store.subscribe((value: NumberDict) => {
@@ -146,7 +159,7 @@ describe('writable()', () => {
     })
 
     it("doesn't update store when key doesn't match", () => {
-      const store = writable('myKey10', 1)
+      const store = persisted('myKey10', 1)
       const values: number[] = []
 
       const unsub = store.subscribe((value: number) => {
@@ -162,7 +175,7 @@ describe('writable()', () => {
     })
 
     it("doesn't update store when there are no subscribers", () => {
-      const store = writable('myKey', 1)
+      const store = persisted('myKey', 1)
       const values: number[] = []
 
       const event = new StorageEvent('storage', {key: 'myKey', newValue: '2'})
@@ -187,12 +200,27 @@ describe('writable()', () => {
 
     const testSet = new Set([1, 2, 3])
 
-    const store = writable('myKey11', testSet, { serializer })
+    const store = persisted('myKey11', testSet, { serializer })
     const value = get(store)
 
     store.update(d => d.add(4))
 
     expect(value).toEqual(testSet)
-    expect(localStorage.myKey11).toEqual(serializer.stringify(testSet))
+    expect(localStorage.myKey11).toEqual(serializer.stringify(new Set([1,2,3,4])))
+  })
+
+  it('lets you switch storage type', () => {
+      vi.spyOn(Object.getPrototypeOf(window.sessionStorage), 'setItem')
+      Object.setPrototypeOf(window.sessionStorage.setItem, vi.fn())
+
+      const value = 'foo'
+
+      const store = persisted('myKey12', value, {
+        storage: 'session'
+      })
+
+      store.set('bar')  
+
+      expect(window.sessionStorage.setItem).toHaveBeenCalled()  
   })
 })

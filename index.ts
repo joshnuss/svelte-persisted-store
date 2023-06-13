@@ -1,4 +1,4 @@
-import {writable as internal, get, type Writable} from 'svelte/store'
+import {writable as internal, type Writable} from 'svelte/store'
 
 declare type Updater<T> = (value: T) => T;
 declare type StoreDict<T> = { [key: string]: Writable<T> }
@@ -11,26 +11,39 @@ interface Serializer<T> {
   stringify(object: T): string
 }
 
+type StorageType = 'local' | 'session'
+
 interface Options<T> {
-  serializer: Serializer<T>
+  serializer?: Serializer<T>
+  storage?: StorageType
+}
+
+function getStorage(type: StorageType) {
+  return type === 'local' ? localStorage : sessionStorage
 }
 
 export function writable<T>(key: string, initialValue: T, options?: Options<T>): Writable<T> {
-  const browser = typeof(localStorage) != 'undefined' && typeof(window) != 'undefined'
-  const serializer = options?.serializer || JSON
+  console.warn("writable() has been deprecated. Please use persisted() instead.\n\nchange:\n\nimport { writable } from 'svelte-local-storage-store'\n\nto:\n\nimport { persisted } from 'svelte-local-storage-store'")
+  return persisted<T>(key, initialValue, options)
+}
+export function persisted<T>(key: string, initialValue: T, options?: Options<T>): Writable<T> {
+  const serializer = options?.serializer ?? JSON
+  const storageType = options?.storage ?? 'local'
+  const browser = typeof(window) !== 'undefined' && typeof(document) !== 'undefined'
+  const storage = browser ? getStorage(storageType) : null
 
   function updateStorage(key: string, value: T) {
-    if (!browser) return
-
-    localStorage.setItem(key, serializer.stringify(value))
+    storage?.setItem(key, serializer.stringify(value))
   }
 
   if (!stores[key]) {
     const store = internal(initialValue, (set) => {
-      const json = browser ? localStorage.getItem(key) : null
+      const json = storage?.getItem(key)
 
       if (json) {
         set(<T>serializer.parse(json))
+      } else {
+        updateStorage(key, initialValue)
       }
 
       if (browser) {
@@ -52,11 +65,14 @@ export function writable<T>(key: string, initialValue: T, options?: Options<T>):
         updateStorage(key, value)
         set(value)
       },
-      update(updater: Updater<T>) {
-        const value = updater(get(store))
+      update(callback: Updater<T>) {
+        return store.update((last) => {
+          const value = callback(last)
 
-        updateStorage(key, value)
-        set(value)
+          updateStorage(key, value)
+
+          return value
+        })
       },
       subscribe
     }

@@ -59,9 +59,7 @@ describe('persisted()', () => {
 
   describe('update()', () => {
     test('replaces old value', () => {
-      localStorage.setItem('myKey5', '123')
-
-      const store = persisted('myKey5', 0)
+      const store = persisted('myKey5', 123)
       store.update(n => n + 1)
       const value = get(store)
 

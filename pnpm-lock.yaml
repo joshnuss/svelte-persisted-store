@@ -30,11 +30,11 @@ devDependencies:
     specifier: ^22.1.0
     version: 22.1.0
   rollup:
-    specifier: ^3.25.1
-    version: 3.25.1
+    specifier: ^3.26.0
+    version: 3.26.0
   rollup-plugin-svelte:
     specifier: ^7.1.0
-    version: 7.1.0(rollup@3.25.1)(svelte@3.49.0)
+    version: 7.1.0(rollup@3.26.0)(svelte@3.49.0)
   semantic-release:
     specifier: 19.0.3
     version: 19.0.3
@@ -4832,7 +4832,7 @@ packages:
       glob: 7.2.3
     dev: true
 
-  /rollup-plugin-svelte@7.1.0(rollup@3.25.1)(svelte@3.49.0):
+  /rollup-plugin-svelte@7.1.0(rollup@3.26.0)(svelte@3.49.0):
     resolution: {integrity: sha512-vopCUq3G+25sKjwF5VilIbiY6KCuMNHP1PFvx2Vr3REBNMDllKHFZN2B9jwwC+MqNc3UPKkjXnceLPEjTjXGXg==}
     engines: {node: '>=10'}
     peerDependencies:
@@ -4840,7 +4840,7 @@ packages:
       svelte: '>=3.5.0'
     dependencies:
       require-relative: 0.8.7
-      rollup: 3.25.1
+      rollup: 3.26.0
       rollup-pluginutils: 2.8.2
       svelte: 3.49.0
     dev: true
@@ -4859,8 +4859,8 @@ packages:
       fsevents: 2.3.2
     dev: true
 
-  /rollup@3.25.1:
-    resolution: {integrity: sha512-tywOR+rwIt5m2ZAWSe5AIJcTat8vGlnPFAv15ycCrw33t6iFsXZ6mzHVFh2psSjxQPmI+xgzMZZizUAukBI4aQ==}
+  /rollup@3.26.0:
+    resolution: {integrity: sha512-YzJH0eunH2hr3knvF3i6IkLO/jTjAEwU4HoMUbQl4//Tnl3ou0e7P5SjxdDr8HQJdeUJShlbEHXrrnEHy1l7Yg==}
     engines: {node: '>=14.18.0', npm: '>=8.0.0'}
     hasBin: true
     optionalDependencies:
@@ -5619,7 +5619,7 @@ packages:
       '@types/node': 18.7.2
       esbuild: 0.17.19
       postcss: 8.4.24
-      rollup: 3.25.1
+      rollup: 3.26.0
     optionalDependencies:
       fsevents: 2.3.2
     dev: true

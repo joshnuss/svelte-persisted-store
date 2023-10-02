@@ -190,6 +190,22 @@ describe('persisted()', () => {
 
       unsub()
     })
+
+    it('ignores session-backed stores', () => {
+      const store = persisted('myKey10', 1, { storage: 'session' })
+      const values = []
+
+      const unsub = store.subscribe((value) => {
+        values.push(value)
+      })
+
+      const event = new StorageEvent('storage', {key: 'myKey10', newValue: '2'})
+      window.dispatchEvent(event)
+
+      expect(values).toEqual([1])
+
+      unsub()
+    })
   })
 
   it('allows custom serialize/deserialize functions', () => {
@@ -210,17 +226,17 @@ describe('persisted()', () => {
   })
 
   it('lets you switch storage type', () => {
-      vi.spyOn(Object.getPrototypeOf(window.sessionStorage), 'setItem')
-      Object.setPrototypeOf(window.sessionStorage.setItem, vi.fn())
+    vi.spyOn(Object.getPrototypeOf(window.sessionStorage), 'setItem')
+    Object.setPrototypeOf(window.sessionStorage.setItem, vi.fn())
 
-      const value = 'foo'
+    const value = 'foo'
 
-      const store = persisted('myKey12', value, {
-        storage: 'session'
-      })
+    const store = persisted('myKey12', value, {
+      storage: 'session'
+    })
 
-      store.set('bar')  
+    store.set('bar')
 
-      expect(window.sessionStorage.setItem).toHaveBeenCalled()  
+    expect(window.sessionStorage.setItem).toHaveBeenCalled()
   })
 })

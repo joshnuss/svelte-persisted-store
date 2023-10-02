@@ -43,8 +43,6 @@ export function persisted<T>(key: string, initialValue: T, options?: Options<T>)
 
       if (json) {
         set(<T>serializer.parse(json))
-      } else {
-        updateStorage(key, initialValue)
       }
 
       if (browser) {

@@ -23,7 +23,7 @@ describe('persisted()', () => {
     const value = get(store)
 
     expect(value).toEqual(123)
-    expect(localStorage.myKey).toEqual('123')
+    expect(localStorage.myKey).toBeUndefined()
   })
 
   test('uses existing value if data already in local storage', () => {

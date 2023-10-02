@@ -4,7 +4,15 @@ declare type Updater<T> = (value: T) => T;
 declare type StoreDict<T> = { [key: string]: Writable<T> }
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-const stores: StoreDict<any> = {}
+interface Stores {
+  local: StoreDict<any>,
+  session: StoreDict<any>,
+}
+
+const stores : Stores = {
+  local: {},
+  session: {}
+}
 
 interface Serializer<T> {
   parse(text: string): T
@@ -37,7 +45,7 @@ export function persisted<T>(key: string, initialValue: T, options?: Options<T>)
     storage?.setItem(key, serializer.stringify(value))
   }
 
-  if (!stores[key]) {
+  if (!stores[storageType][key]) {
     const store = internal(initialValue, (set) => {
       const json = storage?.getItem(key)
 
@@ -45,7 +53,7 @@ export function persisted<T>(key: string, initialValue: T, options?: Options<T>)
         set(<T>serializer.parse(json))
       }
 
-      if (browser) {
+      if (browser && storageType == 'local') {
         const handleStorage = (event: StorageEvent) => {
           if (event.key === key)
             set(event.newValue ? serializer.parse(event.newValue) : null)
@@ -59,7 +67,7 @@ export function persisted<T>(key: string, initialValue: T, options?: Options<T>)
 
     const {subscribe, set} = store
 
-    stores[key] = {
+    stores[storageType][key] = {
       set(value: T) {
         updateStorage(key, value)
         set(value)
@@ -77,5 +85,5 @@ export function persisted<T>(key: string, initialValue: T, options?: Options<T>)
     }
   }
 
-  return stores[key]
+  return stores[storageType][key]
 }

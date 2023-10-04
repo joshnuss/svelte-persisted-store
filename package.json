@@ -1,6 +1,6 @@
 {
   "name": "svelte-persisted-store",
-  "version": "0.6.4",
+  "version": "0.0.0-development",
   "license": "MIT",
   "main": "dist/index.js",
   "module": "dist/index.mjs",

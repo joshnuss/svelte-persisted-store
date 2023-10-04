@@ -1,6 +1,6 @@
 {
   "name": "svelte-local-storage-store",
-  "version": "0.0.0-development",
+  "version": "0.6.4",
   "license": "MIT",
   "main": "dist/index.js",
   "module": "dist/index.mjs",

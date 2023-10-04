@@ -7,7 +7,7 @@ A Svelte store that persists to local storage. Supports changes across multiple 
 ## Installation
 
 ```bash
-npm install svelte-local-storage-store
+npm install svelte-persisted-store
 ```
 
 ## Usage
@@ -15,7 +15,7 @@ npm install svelte-local-storage-store
 Define the store:
 
 ```javascript
-import { persisted } from 'svelte-local-storage-store'
+import { persisted } from 'svelte-persisted-store'
 
 // First param `preferences` is the local storage key.
 // Second param is the initial value.

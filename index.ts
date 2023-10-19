@@ -14,14 +14,14 @@ const stores : Stores = {
   session: {}
 }
 
-interface Serializer<T> {
+export interface Serializer<T> {
   parse(text: string): T
   stringify(object: T): string
 }
 
-type StorageType = 'local' | 'session'
+export type StorageType = 'local' | 'session'
 
-interface Options<T> {
+export interface Options<T> {
   serializer?: Serializer<T>
   storage?: StorageType
 }

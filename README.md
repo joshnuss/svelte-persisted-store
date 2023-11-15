@@ -2,7 +2,7 @@
 
 # svelte-persisted-store
 
-A Svelte store that persists to local storage. Supports changes across multiple tabs.
+A Svelte store that persists to either local storage or cookies. Supports changes across multiple tabs for local storage.
 
 ## Installation
 
@@ -12,14 +12,15 @@ npm install svelte-persisted-store
 
 ## Usage
 
+### Local Storage store
 Define the store:
 
 ```javascript
-import { persisted } from 'svelte-persisted-store'
+import { localPersisted } from 'svelte-persisted-store'
 
 // First param `preferences` is the local storage key.
 // Second param is the initial value.
-export const preferences = persisted('preferences', {
+export const preferences = localPersisted('preferences', {
   theme: 'dark',
   pane: '50%',
   ...
@@ -45,11 +46,43 @@ You can also optionally set the `serializer` or `storage` type:
 import * as devalue from 'devalue'
 
 // third parameter is options.
-export const preferences = persisted('local-storage-key', 'default-value', {
+export const preferences = localPersisted('local-storage-key', 'default-value', {
   serializer: devalue, // defaults to `JSON`
   storage: 'session' // 'session' for sessionStorage, defaults to 'local'
 })
 ```
+
+### Cookie storage store
+The cookie storage stores the same as the local storage stores, except for when running server-side. On the server it needs to manually be initiated with the cookie value. Using SvelteKit, this can be done like the following example:
+
+```javascript
+// page.ts
+import type { PageLoad } from './$types';
+import { cookiePersisted } from 'svelte-persisted-store'
+
+export const load: PageLoad = ({ cookies }) => {
+  return {
+    preferences: cookiePersisted('preferences', JSON.parse(cookies.get('preferences')))
+  };
+};
+```
+
+As cookies also have a couple of different configuration paramaters, the configuration paramater of the cookie storage store exposes these:
+```javascript
+import { cookiePersisted } from 'svelte-persisted-store'
+
+// third parameter is options.
+export const preferences = cookiePersisted('local-storage-key', 'default-value', {
+  serializer: JSON,
+  cookieOptions: {
+    sameSite: 'Strict', // Default: "Strict"; Options: "Strict" | "Lax" | "None"
+    secure: true, // Default: true; Options: true | false
+    path: "/", // Default: "/"; Options: any string
+    expires: new Date(), // Default: A year from now; Options: Any date object
+  }
+})
+```
+
 
 ## License
 

@@ -7,11 +7,13 @@ declare type StoreDict<T> = { [key: string]: Writable<T> }
 interface Stores {
   local: StoreDict<any>,
   session: StoreDict<any>,
+  cookie: StoreDict<any>,
 }
 
-const stores : Stores = {
+const stores: Stores = {
   local: {},
-  session: {}
+  session: {},
+  cookie: {},
 }
 
 export interface Serializer<T> {

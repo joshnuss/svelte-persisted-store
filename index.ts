@@ -30,15 +30,22 @@ function getStorage(type: StorageType) {
   return type === 'local' ? localStorage : sessionStorage
 }
 
-/** @deprecated `writable()` has been renamed to `persisted()` */
+/** @deprecated `writable()` has been renamed to `localPersisted()` */
 export function writable<T>(key: string, initialValue: T, options?: Options<T>): Writable<T> {
-  console.warn("writable() has been deprecated. Please use persisted() instead.\n\nchange:\n\nimport { writable } from 'svelte-persisted-store'\n\nto:\n\nimport { persisted } from 'svelte-persisted-store'")
-  return persisted<T>(key, initialValue, options)
+  console.warn("writable() has been deprecated. Please use localPersisted() instead.\n\nchange:\n\nimport { writable } from 'svelte-persisted-store'\n\nto:\n\nimport { localPersisted } from 'svelte-persisted-store'")
+  return localPersisted<T>(key, initialValue, options)
 }
+
+/** @deprecated `persisted()` has been renamed to `localPersisted()` */
 export function persisted<T>(key: string, initialValue: T, options?: Options<T>): Writable<T> {
+  console.warn("persisted() has been deprecated. Please use localPersisted() instead.\n\nchange:\n\nimport { persisted } from 'svelte-persisted-store'\n\nto:\n\nimport { localPersisted } from 'svelte-persisted-store'")
+  return localPersisted<T>(key, initialValue, options)
+}
+
+export function localPersisted<T>(key: string, initialValue: T, options?: Options<T>): Writable<T> {
   const serializer = options?.serializer ?? JSON
   const storageType = options?.storage ?? 'local'
-  const browser = typeof(window) !== 'undefined' && typeof(document) !== 'undefined'
+  const browser = typeof (window) !== 'undefined' && typeof (document) !== 'undefined'
   const storage = browser ? getStorage(storageType) : null
 
   function updateStorage(key: string, value: T) {

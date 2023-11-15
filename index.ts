@@ -32,6 +32,10 @@ function getStorage(type: StorageType) {
   return type === 'local' ? localStorage : sessionStorage
 }
 
+function isBrowser(): boolean {
+  return typeof (window) !== 'undefined' && typeof (document) !== 'undefined'
+}
+
 /** @deprecated `writable()` has been renamed to `localPersisted()` */
 export function writable<T>(key: string, initialValue: T, options?: LocalStoreOptions<T>): Writable<T> {
   console.warn("writable() has been deprecated. Please use localPersisted() instead.\n\nchange:\n\nimport { writable } from 'svelte-persisted-store'\n\nto:\n\nimport { localPersisted } from 'svelte-persisted-store'")
@@ -47,7 +51,7 @@ export function persisted<T>(key: string, initialValue: T, options?: LocalStoreO
 export function localPersisted<T>(key: string, initialValue: T, options?: LocalStoreOptions<T>): Writable<T> {
   const serializer = options?.serializer ?? JSON
   const storageType = options?.storage ?? 'local'
-  const browser = typeof (window) !== 'undefined' && typeof (document) !== 'undefined'
+  const browser = isBrowser()
   const storage = browser ? getStorage(storageType) : null
 
   function updateStorage(key: string, value: T) {

@@ -125,3 +125,43 @@ export function localPersisted<T>(key: string, initialValue: T, options?: LocalS
 
   return stores[storageType][key]
 }
+
+export function cookiePersisted<T>(key: string, initialValue: T, options?: CookieStoreOptions<T>): Writable<T> {
+  const serializer: Serializer<T> = options?.serializer ?? JSON
+  const browser = isBrowser()
+  let cookieOptions = options?.cookieOptions ?? getDefaultCookieOptions()
+
+  function setCookie(key: string, value: T) {
+    if (!browser) return
+
+    const json = serializer.stringify(value)
+
+    let cookieString = `${key}=${json}; Expires=${cookieOptions.expires.toString()}; SameSite=${cookieOptions.sameSite}; Path=${cookieOptions.path}`
+    if (cookieOptions.secure) {
+      cookieString += "; Secure"
+    }
+
+    document.cookie = cookieString
+  }
+
+  function getCookie(key: string) {
+    if (!browser) return
+
+    return document.cookie
+      .split("; ")
+      .find((row) => row.startsWith(`${key}=`))
+      ?.split('=')[1]
+  }
+
+  if (!stores.cookie[key]) {
+    const existingCookie = getCookie(key)
+    const startValue = existingCookie ? serializer.parse(existingCookie) : initialValue
+    const store = internal(startValue)
+
+    store.subscribe((value) => setCookie(key, value))
+
+    return store
+  }
+
+  return stores.cookie[key]
+}

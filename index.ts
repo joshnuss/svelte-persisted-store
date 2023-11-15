@@ -28,6 +28,31 @@ export interface LocalStoreOptions<T> {
   storage?: StorageType
 }
 
+export interface CookieOptions {
+  sameSite: "Strict" | "Lax" | "None"
+  secure: boolean
+  path: string
+  expires: Date
+}
+
+
+export interface CookieStoreOptions<T> {
+  serializer?: Serializer<T>
+  cookieOptions?: CookieOptions
+}
+
+export function getDefaultCookieOptions(): CookieOptions {
+  const expires = new Date()
+  expires.setFullYear(expires.getFullYear() + 1)
+
+  return {
+    sameSite: 'Strict',
+    secure: true,
+    path: "/",
+    expires
+  }
+}
+
 function getStorage(type: StorageType) {
   return type === 'local' ? localStorage : sessionStorage
 }

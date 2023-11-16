@@ -21,13 +21,6 @@ export interface Serializer<T> {
   stringify(object: T): string
 }
 
-export type StorageType = 'local' | 'session'
-
-export interface LocalStoreOptions<T> {
-  serializer?: Serializer<T>
-  storage?: StorageType
-}
-
 export interface CookieOptions {
   sameSite: "Strict" | "Lax" | "None"
   secure: boolean
@@ -35,9 +28,17 @@ export interface CookieOptions {
   expires: Date
 }
 
-
-export interface CookieStoreOptions<T> {
+export interface StoreOptions<T> {
   serializer?: Serializer<T>
+  storage: 'local' | 'session' | 'cookie'
+}
+
+export interface LocalStoreOptions<T> extends StoreOptions<T> {
+  storage: 'local' | 'session'
+}
+
+export interface CookieStoreOptions<T> extends StoreOptions<T> {
+  storage: 'cookie'
   cookieOptions?: CookieOptions
 }
 
@@ -53,7 +54,7 @@ export function getDefaultCookieOptions(): CookieOptions {
   }
 }
 
-function getStorage(type: StorageType) {
+function getStorage(type: 'local' | 'session') {
   return type === 'local' ? localStorage : sessionStorage
 }
 

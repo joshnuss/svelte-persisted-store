@@ -62,16 +62,19 @@ function isBrowser(): boolean {
   return typeof (window) !== 'undefined' && typeof (document) !== 'undefined'
 }
 
-/** @deprecated `writable()` has been renamed to `localPersisted()` */
-export function writable<T>(key: string, initialValue: T, options?: LocalStoreOptions<T>): Writable<T> {
-  console.warn("writable() has been deprecated. Please use localPersisted() instead.\n\nchange:\n\nimport { writable } from 'svelte-persisted-store'\n\nto:\n\nimport { localPersisted } from 'svelte-persisted-store'")
-  return localPersisted<T>(key, initialValue, options)
+/** @deprecated `writable()` has been renamed to `persisted()` */
+export function writable<T>(key: string, initialValue: T, options?: CookieStoreOptions<T> | LocalStoreOptions<T>): Writable<T> {
+  console.warn("writable() has been deprecated. Please use persisted() instead.\n\nchange:\n\nimport { writable } from 'svelte-persisted-store'\n\nto:\n\nimport { persisted } from 'svelte-persisted-store'")
+  return persisted<T>(key, initialValue, options)
 }
 
-/** @deprecated `persisted()` has been renamed to `localPersisted()` */
-export function persisted<T>(key: string, initialValue: T, options?: LocalStoreOptions<T>): Writable<T> {
-  console.warn("persisted() has been deprecated. Please use localPersisted() instead.\n\nchange:\n\nimport { persisted } from 'svelte-persisted-store'\n\nto:\n\nimport { localPersisted } from 'svelte-persisted-store'")
-  return localPersisted<T>(key, initialValue, options)
+export function persisted<T>(key: string, initialValue: T, options?: CookieStoreOptions<T> | LocalStoreOptions<T>): Writable<T> {
+  if (!options)
+    return localPersisted<T>(key, initialValue)
+  else if (options.storage === "cookie")
+    return cookiePersisted(key, initialValue, options)
+  else
+    return localPersisted(key, initialValue, options)
 }
 
 export function localPersisted<T>(key: string, initialValue: T, options?: LocalStoreOptions<T>): Writable<T> {

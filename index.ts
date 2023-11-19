@@ -1,4 +1,4 @@
-import {writable as internal, type Writable} from 'svelte/store'
+import { writable as internal, type Writable } from 'svelte/store'
 
 declare type Updater<T> = (value: T) => T;
 declare type StoreDict<T> = { [key: string]: Writable<T> }
@@ -9,7 +9,7 @@ interface Stores {
   session: StoreDict<any>,
 }
 
-const stores : Stores = {
+const stores: Stores = {
   local: {},
   session: {}
 }
@@ -24,7 +24,8 @@ export type StorageType = 'local' | 'session'
 export interface Options<T> {
   serializer?: Serializer<T>
   storage?: StorageType,
-  syncTabs: boolean
+  syncTabs: boolean,
+  catchError?: boolean
 }
 
 function getStorage(type: StorageType) {
@@ -40,11 +41,20 @@ export function persisted<T>(key: string, initialValue: T, options?: Options<T>)
   const serializer = options?.serializer ?? JSON
   const storageType = options?.storage ?? 'local'
   const syncTabs = options?.syncTabs ?? true
-  const browser = typeof(window) !== 'undefined' && typeof(document) !== 'undefined'
+  const catchError = options?.catchError ?? true
+  const browser = typeof (window) !== 'undefined' && typeof (document) !== 'undefined'
   const storage = browser ? getStorage(storageType) : null
 
   function updateStorage(key: string, value: T) {
-    storage?.setItem(key, serializer.stringify(value))
+    try {
+      storage?.setItem(key, serializer.stringify(value))
+    } catch (e) {
+      if (catchError) {
+        console.error(`Error when writing value from persisted store "${key}" to ${storageType} storage`, e)
+      } else {
+        throw e
+      }
+    }
   }
 
   if (!stores[storageType][key]) {
@@ -67,7 +77,7 @@ export function persisted<T>(key: string, initialValue: T, options?: Options<T>)
       }
     })
 
-    const {subscribe, set} = store
+    const { subscribe, set } = store
 
     stores[storageType][key] = {
       set(value: T) {

@@ -71,8 +71,8 @@ export function persisted<T>(key: string, initialValue: T, options?: Options<T>)
 
     stores[storageType][key] = {
       set(value: T) {
-        updateStorage(key, value)
         set(value)
+        updateStorage(key, value)
       },
       update(callback: Updater<T>) {
         return store.update((last) => {

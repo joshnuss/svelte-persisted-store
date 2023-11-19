@@ -164,7 +164,7 @@ export function cookiePersisted<T>(key: string, initialValue: T, options?: Cooki
 
     store.subscribe((value) => setCookie(key, value))
 
-    return store
+    stores.cookie[key] = store
   }
 
   return stores.cookie[key]

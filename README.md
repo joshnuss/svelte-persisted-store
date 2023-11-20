@@ -39,7 +39,10 @@ get(preferences) // read value
 $preferences // read value with automatic subscription
 ```
 
-You can also optionally set the `serializer` or `storage` type, and whether to catch errors when writing to session/local storage:
+You can set a couple of options:
+- `serializer` or `storage` type
+- Whether to catch errors when writing to session/local storage (or just re-throw them)
+- Specify a function to be called when encountering error
 
 ```javascript
 import * as devalue from 'devalue'
@@ -49,7 +52,8 @@ export const preferences = persisted('local-storage-key', 'default-value', {
   serializer: devalue, // defaults to `JSON`
   storage: 'session', // 'session' for sessionStorage, defaults to 'local'
   syncTabs: true // choose wether to sync localStorage across tabs, default is true
-  catchError: true // defaults to true
+  catchError: true, // defaults to true
+  onStoreError: (e) => {/* Do something */}
 })
 ```
 

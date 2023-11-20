@@ -26,6 +26,7 @@ export interface Options<T> {
   storage?: StorageType,
   syncTabs: boolean,
   catchError?: boolean
+  onStoreError?: (e: unknown) => void
 }
 
 function getStorage(type: StorageType) {
@@ -42,6 +43,7 @@ export function persisted<T>(key: string, initialValue: T, options?: Options<T>)
   const storageType = options?.storage ?? 'local'
   const syncTabs = options?.syncTabs ?? true
   const catchError = options?.catchError ?? true
+  const onStoreError = options?.onStoreError ?? (() => { })
   const browser = typeof (window) !== 'undefined' && typeof (document) !== 'undefined'
   const storage = browser ? getStorage(storageType) : null
 
@@ -51,7 +53,9 @@ export function persisted<T>(key: string, initialValue: T, options?: Options<T>)
     } catch (e) {
       if (catchError) {
         console.error(`Error when writing value from persisted store "${key}" to ${storageType} storage`, e)
+        onStoreError(e)
       } else {
+        onStoreError(e)
         throw e
       }
     }

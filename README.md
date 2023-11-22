@@ -39,7 +39,7 @@ get(preferences) // read value
 $preferences // read value with automatic subscription
 ```
 
-You can also optionally set the `serializer`, `storage` and `onStoreError` type:
+You can also optionally set the `serializer`, `storage` and `onError` type:
 
 ```javascript
 import * as devalue from 'devalue'
@@ -49,7 +49,7 @@ export const preferences = persisted('local-storage-key', 'default-value', {
   serializer: devalue, // defaults to `JSON`
   storage: 'session', // 'session' for sessionStorage, defaults to 'local'
   syncTabs: true // choose wether to sync localStorage across tabs, default is true
-  onStoreError: (e) => {/* Do something */} // Defaults to console.error with the error object
+  onError: (e) => {/* Do something */} // Defaults to console.error with the error object
 })
 ```
 
@@ -57,7 +57,7 @@ As the library will swallow errors encountered when reading from browser storage
 
 ```javascript
 export const preferences = persisted('local-storage-key', 'default-value', {
-  onStoreError: (e) => {
+  onError: (e) => {
     throw e
   }
 })

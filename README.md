@@ -39,10 +39,7 @@ get(preferences) // read value
 $preferences // read value with automatic subscription
 ```
 
-You can set a couple of options:
-- `serializer` or `storage` type
-- Whether to catch errors when writing to session/local storage (or just re-throw them)
-- Specify a function to be called when encountering error
+You can also optionally set the `serializer`, `storage` and `onStoreError` type:
 
 ```javascript
 import * as devalue from 'devalue'
@@ -52,8 +49,17 @@ export const preferences = persisted('local-storage-key', 'default-value', {
   serializer: devalue, // defaults to `JSON`
   storage: 'session', // 'session' for sessionStorage, defaults to 'local'
   syncTabs: true // choose wether to sync localStorage across tabs, default is true
-  catchError: true, // defaults to true
-  onStoreError: (e) => {/* Do something */}
+  onStoreError: (e) => {/* Do something */} // Defaults to console.error with the error object
+})
+```
+
+As the library will swallow errors encountered when reading from browser storage it is possible to specify a custom function to handle the error. Should the swallowing not be desirable, it is possible to re-throw the error like the following example (not recommended):
+
+```javascript
+export const preferences = persisted('local-storage-key', 'default-value', {
+  onStoreError: (e) => {
+    throw e
+  }
 })
 ```
 

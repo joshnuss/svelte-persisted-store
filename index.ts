@@ -25,7 +25,6 @@ export interface Options<T> {
   serializer?: Serializer<T>
   storage?: StorageType,
   syncTabs: boolean,
-  catchError?: boolean
   onStoreError?: (e: unknown) => void
 }
 
@@ -42,8 +41,7 @@ export function persisted<T>(key: string, initialValue: T, options?: Options<T>)
   const serializer = options?.serializer ?? JSON
   const storageType = options?.storage ?? 'local'
   const syncTabs = options?.syncTabs ?? true
-  const catchError = options?.catchError ?? true
-  const onStoreError = options?.onStoreError ?? (() => { })
+  const onStoreError = options?.onStoreError ?? ((e) => console.error(`Error when writing value from persisted store "${key}" to ${storageType}`, e))
   const browser = typeof (window) !== 'undefined' && typeof (document) !== 'undefined'
   const storage = browser ? getStorage(storageType) : null
 
@@ -51,13 +49,7 @@ export function persisted<T>(key: string, initialValue: T, options?: Options<T>)
     try {
       storage?.setItem(key, serializer.stringify(value))
     } catch (e) {
-      if (catchError) {
-        console.error(`Error when writing value from persisted store "${key}" to ${storageType} storage`, e)
-        onStoreError(e)
-      } else {
-        onStoreError(e)
-        throw e
-      }
+      onStoreError(e)
     }
   }
 

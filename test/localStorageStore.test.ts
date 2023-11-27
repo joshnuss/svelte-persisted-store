@@ -1,5 +1,6 @@
 import { persisted, writable } from '../index'
 import { get } from 'svelte/store'
+import { expect, vi, beforeEach, describe, test, it } from 'vitest'
 
 beforeEach(() => localStorage.clear())
 
@@ -193,7 +194,7 @@ describe('persisted()', () => {
 
     it('ignores session-backed stores', () => {
       const store = persisted('myKey10', 1, { storage: 'session' })
-      const values = []
+      const values: number[] = []
 
       const unsub = store.subscribe((value) => {
         values.push(value)

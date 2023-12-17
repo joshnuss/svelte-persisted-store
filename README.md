@@ -47,7 +47,8 @@ import * as devalue from 'devalue'
 // third parameter is options.
 export const preferences = persisted('local-storage-key', 'default-value', {
   serializer: devalue, // defaults to `JSON`
-  storage: 'session' // 'session' for sessionStorage, defaults to 'local'
+  storage: 'session', // 'session' for sessionStorage, defaults to 'local'
+  syncTabs: true // choose wether to sync localStorage across tabs, default is true
 })
 ```
 

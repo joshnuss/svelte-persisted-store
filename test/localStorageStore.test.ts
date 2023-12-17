@@ -206,6 +206,22 @@ describe('persisted()', () => {
 
       unsub()
     })
+
+    it("doesn't update, when syncTabs option is disabled", () => {
+      const store = persisted('myKey13', 1, { syncTabs: false })
+      const values = []
+
+      const unsub = store.subscribe((value) => {
+        values.push(value)
+      })
+
+      const event = new StorageEvent('storage', {key: 'myKey13', newValue: '2'})
+      window.dispatchEvent(event)
+
+      expect(values).toEqual([1])
+
+      unsub()
+    })
   })
 
   it('allows custom serialize/deserialize functions', () => {

@@ -23,7 +23,8 @@ export type StorageType = 'local' | 'session'
 
 export interface Options<T> {
   serializer?: Serializer<T>
-  storage?: StorageType
+  storage?: StorageType,
+  syncTabs: boolean
 }
 
 function getStorage(type: StorageType) {
@@ -38,6 +39,7 @@ export function writable<T>(key: string, initialValue: T, options?: Options<T>):
 export function persisted<T>(key: string, initialValue: T, options?: Options<T>): Writable<T> {
   const serializer = options?.serializer ?? JSON
   const storageType = options?.storage ?? 'local'
+  const syncTabs = options?.syncTabs ?? true
   const browser = typeof(window) !== 'undefined' && typeof(document) !== 'undefined'
   const storage = browser ? getStorage(storageType) : null
 
@@ -53,7 +55,7 @@ export function persisted<T>(key: string, initialValue: T, options?: Options<T>)
         set(<T>serializer.parse(json))
       }
 
-      if (browser && storageType == 'local') {
+      if (browser && storageType == 'local' && syncTabs) {
         const handleStorage = (event: StorageEvent) => {
           if (event.key === key)
             set(event.newValue ? serializer.parse(event.newValue) : null)

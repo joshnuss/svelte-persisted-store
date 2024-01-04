@@ -76,6 +76,14 @@ describe('persisted()', () => {
       expect(localStorage.myKey6).toEqual('124')
       expect(value).toEqual(124)
     })
+
+    test("BUG: update should use existing value", () => {
+      localStorage.setItem('myKey6b', '12345')
+      const store = persisted('myKey6b', 123)
+      store.update(n => { n += 1; return n })
+
+      expect(localStorage.myKey6b).toEqual('12346')
+    })
   })
 
   describe('subscribe()', () => {

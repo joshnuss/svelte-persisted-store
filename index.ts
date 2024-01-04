@@ -53,14 +53,19 @@ export function persisted<T>(key: string, initialValue: T, options?: Options<T>)
     }
   }
 
+  function maybeLoadInitial(): T {
+    const json = storage?.getItem(key)
+
+    if (json) {
+      return <T>serializer.parse(json)
+    }
+
+    return initialValue
+  }
+
   if (!stores[storageType][key]) {
-    const store = internal(initialValue, (set) => {
-      const json = storage?.getItem(key)
-
-      if (json) {
-        set(<T>serializer.parse(json))
-      }
-
+    const initial = maybeLoadInitial()
+    const store = internal(initial, (set) => {
       if (browser && storageType == 'local' && syncTabs) {
         const handleStorage = (event: StorageEvent) => {
           if (event.key === key)

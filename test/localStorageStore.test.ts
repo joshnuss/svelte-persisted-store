@@ -184,12 +184,13 @@ describe('persisted()', () => {
     })
 
     it("doesn't update store when there are no subscribers", () => {
-      const store = persisted('myKey', 1)
+      localStorage.setItem('myKeyb', '2')
+
+      const store = persisted('myKeyb', 1)
       const values: number[] = []
 
-      const event = new StorageEvent('storage', {key: 'myKey', newValue: '2'})
+      const event = new StorageEvent('storage', {key: 'myKeyb', newValue: '2'})
       window.dispatchEvent(event)
-      localStorage.setItem('myKey', '2')
 
       const unsub = store.subscribe((value: number) => {
         values.push(value)

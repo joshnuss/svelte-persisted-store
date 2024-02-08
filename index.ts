@@ -24,7 +24,7 @@ export type StorageType = 'local' | 'session'
 export interface Options<T> {
   serializer?: Serializer<T>
   storage?: StorageType,
-  syncTabs: boolean,
+  syncTabs?: boolean,
   onError?: (e: unknown) => void
 }
 

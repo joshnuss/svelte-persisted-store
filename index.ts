@@ -27,6 +27,7 @@ export interface Options<T> {
   syncTabs?: boolean,
   onError?: (e: unknown) => void
   onWriteError?: (e: unknown) => void
+  onParseError?: (newValue: string | null, e: unknown) => void
 }
 
 function getStorage(type: StorageType) {
@@ -45,6 +46,7 @@ export function persisted<T>(key: string, initialValue: T, options?: Options<T>)
   const storageType = options?.storage ?? 'local'
   const syncTabs = options?.syncTabs ?? true
   const onWriteError = options?.onWriteError ?? options?.onError ?? ((e) => console.error(`Error when writing value from persisted store "${key}" to ${storageType}`, e))
+  const onParseError = options?.onParseError ?? ((newVal, e) => console.error(`Error when parsing ${newVal ? '"' + newVal + '"' : "value"} from persisted store "${key}"`, e))
   const browser = typeof (window) !== 'undefined' && typeof (document) !== 'undefined'
   const storage = browser ? getStorage(storageType) : null
 
@@ -60,7 +62,11 @@ export function persisted<T>(key: string, initialValue: T, options?: Options<T>)
     const json = storage?.getItem(key)
 
     if (json) {
-      return <T>serializer.parse(json)
+      try {
+        return <T>serializer.parse(json)
+      } catch (e) {
+        onParseError(json, e)
+      }
     }
 
     return initialValue
@@ -71,8 +77,16 @@ export function persisted<T>(key: string, initialValue: T, options?: Options<T>)
     const store = internal(initial, (set) => {
       if (browser && storageType == 'local' && syncTabs) {
         const handleStorage = (event: StorageEvent) => {
-          if (event.key === key)
-            set(event.newValue ? serializer.parse(event.newValue) : null)
+          if (event.key === key) {
+            let newVal: any
+            try {
+              newVal = event.newValue ? serializer.parse(event.newValue) : null
+            } catch (e) {
+              onParseError(event.newValue, e)
+              return
+            }
+            set(newVal)
+          }
         }
 
         window.addEventListener("storage", handleStorage)

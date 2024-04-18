@@ -26,6 +26,7 @@ export interface Options<T> {
   storage?: StorageType,
   syncTabs?: boolean,
   onError?: (e: unknown) => void
+  onWriteError?: (e: unknown) => void
 }
 
 function getStorage(type: StorageType) {
@@ -38,10 +39,12 @@ export function writable<T>(key: string, initialValue: T, options?: Options<T>):
   return persisted<T>(key, initialValue, options)
 }
 export function persisted<T>(key: string, initialValue: T, options?: Options<T>): Writable<T> {
+  if (options?.onError) console.warn("onError has been deprecated. Please use onWriteError instead")
+
   const serializer = options?.serializer ?? JSON
   const storageType = options?.storage ?? 'local'
   const syncTabs = options?.syncTabs ?? true
-  const onError = options?.onError ?? ((e) => console.error(`Error when writing value from persisted store "${key}" to ${storageType}`, e))
+  const onWriteError = options?.onWriteError ?? options?.onError ?? ((e) => console.error(`Error when writing value from persisted store "${key}" to ${storageType}`, e))
   const browser = typeof (window) !== 'undefined' && typeof (document) !== 'undefined'
   const storage = browser ? getStorage(storageType) : null
 
@@ -49,7 +52,7 @@ export function persisted<T>(key: string, initialValue: T, options?: Options<T>)
     try {
       storage?.setItem(key, serializer.stringify(value))
     } catch (e) {
-      onError(e)
+      onWriteError(e)
     }
   }
 

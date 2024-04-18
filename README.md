@@ -39,7 +39,7 @@ get(preferences) // read value
 $preferences // read value with automatic subscription
 ```
 
-You can also optionally set the `serializer`, `storage` and `onError` type:
+You can also optionally set the `serializer`, `storage`, `onWriteError` and `onParseError` type:
 
 ```javascript
 import * as devalue from 'devalue'
@@ -48,20 +48,26 @@ import * as devalue from 'devalue'
 export const preferences = persisted('local-storage-key', 'default-value', {
   serializer: devalue, // defaults to `JSON`
   storage: 'session', // 'session' for sessionStorage, defaults to 'local'
-  syncTabs: true // choose wether to sync localStorage across tabs, default is true
-  onError: (e) => {/* Do something */} // Defaults to console.error with the error object
+  syncTabs: true, // choose wether to sync localStorage across tabs, default is true
+  onWriteError: (e) => {/* Do something */}, // Defaults to console.error with the error object
+  onParseError: (newVal, e) => {/* Do something */}, // Defaults to console.error with the error object
 })
 ```
 
-As the library will swallow errors encountered when reading from browser storage it is possible to specify a custom function to handle the error. Should the swallowing not be desirable, it is possible to re-throw the error like the following example (not recommended):
+As the library will swallow errors encountered when writing to the browser storage, or parsing the string value gotten from browser storage, it is possible to specify a custom function to handle the error. Should the swallowing not be desirable, it is possible to re-throw the error like the following example (not recommended):
 
 ```javascript
 export const preferences = persisted('local-storage-key', 'default-value', {
-  onError: (e) => {
+  onWriteError: (e) => {
+    throw e
+  },
+  onParseError: (newVal, e) => {
     throw e
   }
 })
 ```
+
+The newVal parameter passed to the onParseError handler is the string value which was attempted (but failed) to serialize
 
 ## License
 

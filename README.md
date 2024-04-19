@@ -2,7 +2,7 @@
 
 # svelte-persisted-store
 
-A Svelte store that persists to local storage. Supports changes across multiple tabs.
+A Svelte store that persists to local storage. Can sync changes across browser tabs.
 
 ## Installation
 
@@ -26,7 +26,7 @@ export const preferences = persisted('preferences', {
 })
 ```
 
-Then when you want to use the store:
+Then, to use it:
 
 ```javascript
 import { get } from 'svelte/store'
@@ -39,35 +39,20 @@ get(preferences) // read value
 $preferences // read value with automatic subscription
 ```
 
-You can also optionally set the `serializer`, `storage`, `onWriteError` and `onParseError` type:
+Additional options can be specified:
 
 ```javascript
 import * as devalue from 'devalue'
 
-// third parameter is options.
+// third parameter is options
 export const preferences = persisted('local-storage-key', 'default-value', {
   serializer: devalue, // defaults to `JSON`
   storage: 'session', // 'session' for sessionStorage, defaults to 'local'
   syncTabs: true, // choose wether to sync localStorage across tabs, default is true
-  onWriteError: (e) => {/* Do something */}, // Defaults to console.error with the error object
-  onParseError: (newVal, e) => {/* Do something */}, // Defaults to console.error with the error object
+  onWriteError: (e) => {/* handle or rethrow */}, // Defaults to console.error with the error object
+  onParseError: (raw, e) => {/* handle or rethrow */}, // Defaults to console.error with the error object
 })
 ```
-
-As the library will swallow errors encountered when writing to the browser storage, or parsing the string value gotten from browser storage, it is possible to specify a custom function to handle the error. Should the swallowing not be desirable, it is possible to re-throw the error like the following example (not recommended):
-
-```javascript
-export const preferences = persisted('local-storage-key', 'default-value', {
-  onWriteError: (e) => {
-    throw e
-  },
-  onParseError: (newVal, e) => {
-    throw e
-  }
-})
-```
-
-The newVal parameter passed to the onParseError handler is the string value which was attempted (but failed) to serialize
 
 ## License
 

@@ -23,7 +23,7 @@ describe('persisted()', () => {
   it('calls custom error function', () => {
     const mockFunc = vi.fn()
 
-    const store = persisted('myKey2', 'myVal', { onError: mockFunc })
+    const store = persisted('myKey2', 'myVal', { onWriteError: mockFunc })
     store.set("myNewVal")
 
     expect(mockFunc).toHaveBeenCalledOnce()

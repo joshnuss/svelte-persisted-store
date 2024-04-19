@@ -48,7 +48,7 @@ import * as devalue from 'devalue'
 export const preferences = persisted('local-storage-key', 'default-value', {
   serializer: devalue, // defaults to `JSON`
   storage: 'session', // 'session' for sessionStorage, defaults to 'local'
-  syncTabs: true, // choose wether to sync localStorage across tabs, default is true
+  syncTabs: true, // choose whether to sync localStorage across tabs, default is true
   onWriteError: (error) => {/* handle or rethrow */}, // Defaults to console.error with the error object
   onParseError: (raw, error) => {/* handle or rethrow */}, // Defaults to console.error with the error object
 })

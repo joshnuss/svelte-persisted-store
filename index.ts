@@ -14,20 +14,22 @@ const stores: Stores = {
   session: {}
 }
 
-export interface Serializer<T> {
-  parse(text: string): T
-  stringify(object: T): string
+export interface Serializer {
+  parse(text: string): any
+  stringify(object: any): string
 }
 
 export type StorageType = 'local' | 'session'
 
 export interface Options<T> {
-  serializer?: Serializer<T>
+  serializer?: Serializer
   storage?: StorageType,
   syncTabs?: boolean,
   onError?: (e: unknown) => void
   onWriteError?: (e: unknown) => void
   onParseError?: (newValue: string | null, e: unknown) => void
+  beforeRead?: (val: any) => T
+  beforeWrite?: (val: T) => any
 }
 
 function getStorage(type: StorageType) {
@@ -47,29 +49,33 @@ export function persisted<T>(key: string, initialValue: T, options?: Options<T>)
   const syncTabs = options?.syncTabs ?? true
   const onWriteError = options?.onWriteError ?? options?.onError ?? ((e) => console.error(`Error when writing value from persisted store "${key}" to ${storageType}`, e))
   const onParseError = options?.onParseError ?? ((newVal, e) => console.error(`Error when parsing ${newVal ? '"' + newVal + '"' : "value"} from persisted store "${key}"`, e))
+
+  const beforeRead = options?.beforeRead ?? ((val) => val as T)
+  const beforeWrite = options?.beforeWrite ?? ((val) => val as any)
+
   const browser = typeof (window) !== 'undefined' && typeof (document) !== 'undefined'
   const storage = browser ? getStorage(storageType) : null
 
   function updateStorage(key: string, value: T) {
+    const newVal = beforeWrite(value)
     try {
-      storage?.setItem(key, serializer.stringify(value))
+      storage?.setItem(key, serializer.stringify(newVal))
     } catch (e) {
       onWriteError(e)
     }
   }
 
   function maybeLoadInitial(): T {
-    const json = storage?.getItem(key)
-
-    if (json) {
+    function serialize(json: any) {
       try {
         return <T>serializer.parse(json)
       } catch (e) {
         onParseError(json, e)
       }
     }
+    const json = storage?.getItem(key)
 
-    return initialValue
+    return json ? beforeRead(serialize(json)) : initialValue
   }
 
   if (!stores[storageType][key]) {
@@ -85,7 +91,8 @@ export function persisted<T>(key: string, initialValue: T, options?: Options<T>)
               onParseError(event.newValue, e)
               return
             }
-            set(newVal)
+            const processedVal = beforeRead(newVal)
+            set(processedVal)
           }
         }
 

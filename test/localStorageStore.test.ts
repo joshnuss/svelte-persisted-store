@@ -132,6 +132,36 @@ describe('persisted()', () => {
     unsub2()
   })
 
+  describe("beforeRead and beforeWrite", () => {
+    it("allows modifying initial value before reading", () => {
+      localStorage.setItem("beforeRead-init-test", JSON.stringify(2))
+      const store = persisted("beforeRead-init-test", 0, { beforeRead: (v) => v * 2 })
+      expect(get(store)).toEqual(4)
+    })
+    it("allows modfiying value before reading upon event", () => {
+      const store = persisted("beforeRead-test", 0, { beforeRead: (v) => v * 2 })
+      const values: number[] = []
+
+      const unsub = store.subscribe((val: number) => {
+        values.push(val)
+      })
+
+      const event = new StorageEvent('storage', {key: 'beforeRead-test', newValue: "2"})
+      window.dispatchEvent(event)
+
+      expect(values).toEqual([0, 4])
+
+      unsub()
+    })
+
+    it("allows modfiying value before writing", () => {
+      const store = persisted("beforeWrite-test", 0, { beforeWrite: (v) => v * 2 })
+      store.set(2)
+
+      expect(JSON.parse(localStorage.getItem("beforeWrite-test") as string)).toEqual(4)
+    })
+  })
+
   describe('handles window.storage event', () => {
     type NumberDict = { [key: string] : number }
 

@@ -77,10 +77,10 @@ export function persisted<T>(key: string, initialValue: T, options?: Options<T>)
     const store = internal(initial, (set) => {
       if (browser && storageType == 'local' && syncTabs) {
         const handleStorage = (event: StorageEvent) => {
-          if (event.key === key) {
+          if (event.key === key && event.newValue) {
             let newVal: any
             try {
-              newVal = event.newValue ? serializer.parse(event.newValue) : null
+              newVal = serializer.parse(event.newValue)
             } catch (e) {
               onParseError(event.newValue, e)
               return

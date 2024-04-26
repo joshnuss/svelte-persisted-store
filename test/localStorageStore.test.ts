@@ -151,7 +151,7 @@ describe('persisted()', () => {
       unsub()
     })
 
-    it('sets store to null when value is null', () => {
+    it('ignores storages events when value is null', () => {
       const store = persisted('myKey9', {a: 1})
       const values: NumberDict[] = []
 
@@ -162,7 +162,7 @@ describe('persisted()', () => {
       const event = new StorageEvent('storage', {key: 'myKey9', newValue: null})
       window.dispatchEvent(event)
 
-      expect(values).toEqual([{a: 1}, null])
+      expect(values).toEqual([{a: 1}])
 
       unsub()
     })

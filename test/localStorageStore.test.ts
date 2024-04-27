@@ -138,7 +138,7 @@ describe('persisted()', () => {
       const store = persisted("beforeRead-init-test", 0, { beforeRead: (v) => v * 2 })
       expect(get(store)).toEqual(4)
     })
-    it("allows modfiying value before reading upon event", () => {
+    it("allows modifying value before reading upon event", () => {
       const store = persisted("beforeRead-test", 0, { beforeRead: (v) => v * 2 })
       const values: number[] = []
 
@@ -154,7 +154,7 @@ describe('persisted()', () => {
       unsub()
     })
 
-    it("allows modfiying value before writing", () => {
+    it("allows modifying value before writing", () => {
       const store = persisted("beforeWrite-test", 0, { beforeWrite: (v) => v * 2 })
       store.set(2)
 

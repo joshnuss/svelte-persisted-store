@@ -14,22 +14,22 @@ const stores: Stores = {
   session: {}
 }
 
-export interface Serializer {
-  parse(text: string): any
-  stringify(object: any): string
+export interface Serializer<T> {
+  parse(text: string): T
+  stringify(object: T): string
 }
 
 export type StorageType = 'local' | 'session'
 
-export interface Options<T> {
-  serializer?: Serializer
+export interface Options<StoreType, SerializerType> {
+  serializer?: Serializer<SerializerType>
   storage?: StorageType,
   syncTabs?: boolean,
   onError?: (e: unknown) => void
   onWriteError?: (e: unknown) => void
   onParseError?: (newValue: string | null, e: unknown) => void
-  beforeRead?: <S extends symbol>(val: any, cancel: S) => T | S
-  beforeWrite?: <S extends symbol>(val: T, cancel: S) => any | S
+  beforeRead?: <S extends symbol>(val: SerializerType, cancel: S) => StoreType | S
+  beforeWrite?: <S extends symbol>(val: StoreType, cancel: S) => SerializerType | S
 }
 
 function getStorage(type: StorageType) {
@@ -37,11 +37,11 @@ function getStorage(type: StorageType) {
 }
 
 /** @deprecated `writable()` has been renamed to `persisted()` */
-export function writable<T>(key: string, initialValue: T, options?: Options<T>): Writable<T> {
+export function writable<StoreType, SerializerType>(key: string, initialValue: StoreType, options?: Options<StoreType, SerializerType>): Writable<StoreType> {
   console.warn("writable() has been deprecated. Please use persisted() instead.\n\nchange:\n\nimport { writable } from 'svelte-persisted-store'\n\nto:\n\nimport { persisted } from 'svelte-persisted-store'")
-  return persisted<T>(key, initialValue, options)
+  return persisted<StoreType, SerializerType>(key, initialValue, options)
 }
-export function persisted<T>(key: string, initialValue: T, options?: Options<T>): Writable<T> {
+export function persisted<StoreType, SerializerType>(key: string, initialValue: StoreType, options?: Options<StoreType, SerializerType>): Writable<StoreType> {
   if (options?.onError) console.warn("onError has been deprecated. Please use onWriteError instead")
 
   const serializer = options?.serializer ?? JSON
@@ -50,13 +50,13 @@ export function persisted<T>(key: string, initialValue: T, options?: Options<T>)
   const onWriteError = options?.onWriteError ?? options?.onError ?? ((e) => console.error(`Error when writing value from persisted store "${key}" to ${storageType}`, e))
   const onParseError = options?.onParseError ?? ((newVal, e) => console.error(`Error when parsing ${newVal ? '"' + newVal + '"' : "value"} from persisted store "${key}"`, e))
 
-  const beforeRead = options?.beforeRead ?? ((val) => val as T)
-  const beforeWrite = options?.beforeWrite ?? ((val) => val as any)
+  const beforeRead = options?.beforeRead ?? ((val) => val as unknown as StoreType)
+  const beforeWrite = options?.beforeWrite ?? ((val) => val as unknown as SerializerType)
 
   const browser = typeof (window) !== 'undefined' && typeof (document) !== 'undefined'
   const storage = browser ? getStorage(storageType) : null
 
-  function updateStorage(key: string, value: T) {
+  function updateStorage(key: string, value: StoreType) {
     const cancel = Symbol("cancel")
     const newVal = beforeWrite(value, cancel)
     if (newVal === cancel) return
@@ -68,10 +68,10 @@ export function persisted<T>(key: string, initialValue: T, options?: Options<T>)
     }
   }
 
-  function maybeLoadInitial(): T {
+  function maybeLoadInitial(): StoreType {
     function serialize(json: any) {
       try {
-        return <T>serializer.parse(json)
+        return <SerializerType>serializer.parse(json)
       } catch (e) {
         onParseError(json, e)
       }
@@ -118,11 +118,11 @@ export function persisted<T>(key: string, initialValue: T, options?: Options<T>)
     const { subscribe, set } = store
 
     stores[storageType][key] = {
-      set(value: T) {
+      set(value: StoreType) {
         set(value)
         updateStorage(key, value)
       },
-      update(callback: Updater<T>) {
+      update(callback: Updater<StoreType>) {
         return store.update((last) => {
           const value = callback(last)
 

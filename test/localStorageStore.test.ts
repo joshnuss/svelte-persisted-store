@@ -135,11 +135,11 @@ describe('persisted()', () => {
   describe("beforeRead and beforeWrite", () => {
     it("allows modifying initial value before reading", () => {
       localStorage.setItem("beforeRead-init-test", JSON.stringify(2))
-      const store = persisted("beforeRead-init-test", 0, { beforeRead: (v) => v * 2 })
+      const store = persisted("beforeRead-init-test", 0, { beforeRead: (v: number) => v * 2 })
       expect(get(store)).toEqual(4)
     })
     it("allows modifying value before reading upon event", () => {
-      const store = persisted("beforeRead-test", 0, { beforeRead: (v) => v * 2 })
+      const store = persisted("beforeRead-test", 0, { beforeRead: (v: number) => v * 2 })
       const values: number[] = []
 
       const unsub = store.subscribe((val: number) => {
@@ -193,7 +193,7 @@ describe('persisted()', () => {
 
     it("allows to cancel write operation", () => {
       const beforeWrite = vi.fn(<S extends symbol>(_: number, cancel: S) => cancel)
-      const store = persisted<number>("beforeWrite-cancel", 0, { beforeWrite })
+      const store = persisted<number, number>("beforeWrite-cancel", 0, { beforeWrite })
       store.set(2)
 
       expect(JSON.parse(localStorage.getItem("beforeWrite-cancel") as string)).toEqual(null)

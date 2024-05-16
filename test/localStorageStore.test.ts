@@ -289,7 +289,7 @@ describe('persisted()', () => {
 
     it("doesn't update, when syncTabs option is disabled", () => {
       const store = persisted('myKey13', 1, { syncTabs: false })
-      const values = []
+      const values: number[] = []
 
       const unsub = store.subscribe((value) => {
         values.push(value)

@@ -90,7 +90,7 @@ describe('persisted()', () => {
     it('publishes updates', () => {
       const store = persisted('myKey7', 123)
       const values: number[] = []
-      const unsub = store.subscribe((value : number) => {
+      const unsub = store.subscribe((value: number) => {
         if (value !== undefined) values.push(value)
       })
       store.set(456)
@@ -146,7 +146,7 @@ describe('persisted()', () => {
         values.push(val)
       })
 
-      const event = new StorageEvent('storage', {key: 'beforeRead-test', newValue: "2"})
+      const event = new StorageEvent('storage', { key: 'beforeRead-test', newValue: "2" })
       window.dispatchEvent(event)
 
       expect(values).toEqual([0, 4])
@@ -160,39 +160,79 @@ describe('persisted()', () => {
 
       expect(JSON.parse(localStorage.getItem("beforeWrite-test") as string)).toEqual(4)
     })
+
+    it("allows to cancel read operation during initialization", () => {
+      localStorage.setItem("beforeRead-init-cancel", JSON.stringify(2))
+      const beforeRead = vi.fn(<S extends symbol>(_: any, cancel: S) => cancel)
+      const store = persisted("beforeRead-init-cancel", 0, { beforeRead })
+      expect(beforeRead).toHaveBeenCalledOnce()
+      expect(get(store)).toEqual(0)
+    })
+
+    it("allows to cancel read operation during event handling", () => {
+      // Will only call beforeRead on init if key exists, so creates key
+      localStorage.setItem("beforeRead-cancel", JSON.stringify(2))
+
+      const beforeRead = vi.fn(<S extends symbol>(_: any, cancel: S) => cancel)
+      const store = persisted("beforeRead-cancel", 0, { beforeRead })
+
+      const values: number[] = []
+
+      const unsub = store.subscribe((val: number) => {
+        values.push(val)
+      })
+
+      const event = new StorageEvent('storage', { key: 'beforeRead-cancel', newValue: "2" })
+      window.dispatchEvent(event)
+
+      expect(beforeRead).toHaveBeenCalledTimes(2)
+      expect(values).toEqual([0])
+
+      unsub()
+    })
+
+    it("allows to cancel write operation", () => {
+      const beforeWrite = vi.fn(<S extends symbol>(_: number, cancel: S) => cancel)
+      const store = persisted<number>("beforeWrite-cancel", 0, { beforeWrite })
+      store.set(2)
+
+      expect(JSON.parse(localStorage.getItem("beforeWrite-cancel") as string)).toEqual(null)
+      expect(get(store)).toEqual(2)
+      expect(beforeWrite).toHaveBeenCalledOnce()
+    })
   })
 
   describe('handles window.storage event', () => {
-    type NumberDict = { [key: string] : number }
+    type NumberDict = { [key: string]: number }
 
     it('sets storage when key matches', () => {
-      const store = persisted('myKey8', {a: 1})
+      const store = persisted('myKey8', { a: 1 })
       const values: NumberDict[] = []
 
       const unsub = store.subscribe((value: NumberDict) => {
         values.push(value)
       })
 
-      const event = new StorageEvent('storage', {key: 'myKey8', newValue: '{"a": 1, "b": 2}'})
+      const event = new StorageEvent('storage', { key: 'myKey8', newValue: '{"a": 1, "b": 2}' })
       window.dispatchEvent(event)
 
-      expect(values).toEqual([{a: 1}, {a: 1, b: 2}])
+      expect(values).toEqual([{ a: 1 }, { a: 1, b: 2 }])
 
       unsub()
     })
 
     it('ignores storages events when value is null', () => {
-      const store = persisted('myKey9', {a: 1})
+      const store = persisted('myKey9', { a: 1 })
       const values: NumberDict[] = []
 
       const unsub = store.subscribe((value: NumberDict) => {
         values.push(value)
       })
 
-      const event = new StorageEvent('storage', {key: 'myKey9', newValue: null})
+      const event = new StorageEvent('storage', { key: 'myKey9', newValue: null })
       window.dispatchEvent(event)
 
-      expect(values).toEqual([{a: 1}])
+      expect(values).toEqual([{ a: 1 }])
 
       unsub()
     })
@@ -205,7 +245,7 @@ describe('persisted()', () => {
         values.push(value)
       })
 
-      const event = new StorageEvent('storage', {key: 'unknownKey', newValue: '2'})
+      const event = new StorageEvent('storage', { key: 'unknownKey', newValue: '2' })
       window.dispatchEvent(event)
 
       expect(values).toEqual([1])
@@ -219,7 +259,7 @@ describe('persisted()', () => {
       const store = persisted('myKeyb', 1)
       const values: number[] = []
 
-      const event = new StorageEvent('storage', {key: 'myKeyb', newValue: '2'})
+      const event = new StorageEvent('storage', { key: 'myKeyb', newValue: '2' })
       window.dispatchEvent(event)
 
       const unsub = store.subscribe((value: number) => {
@@ -239,7 +279,7 @@ describe('persisted()', () => {
         values.push(value)
       })
 
-      const event = new StorageEvent('storage', {key: 'myKey10', newValue: '2'})
+      const event = new StorageEvent('storage', { key: 'myKey10', newValue: '2' })
       window.dispatchEvent(event)
 
       expect(values).toEqual([1])
@@ -255,7 +295,7 @@ describe('persisted()', () => {
         values.push(value)
       })
 
-      const event = new StorageEvent('storage', {key: 'myKey13', newValue: '2'})
+      const event = new StorageEvent('storage', { key: 'myKey13', newValue: '2' })
       window.dispatchEvent(event)
 
       expect(values).toEqual([1])
@@ -278,7 +318,7 @@ describe('persisted()', () => {
     store.update(d => d.add(4))
 
     expect(value).toEqual(testSet)
-    expect(localStorage.myKey11).toEqual(serializer.stringify(new Set([1,2,3,4])))
+    expect(localStorage.myKey11).toEqual(serializer.stringify(new Set([1, 2, 3, 4])))
   })
 
   it('lets you switch storage type', () => {

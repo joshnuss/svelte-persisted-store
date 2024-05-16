@@ -51,8 +51,8 @@ export const preferences = persisted('local-storage-key', 'default-value', {
   syncTabs: true, // choose whether to sync localStorage across tabs, default is true
   onWriteError: (error) => {/* handle or rethrow */}, // Defaults to console.error with the error object
   onParseError: (raw, error) => {/* handle or rethrow */}, // Defaults to console.error with the error object
-  beforeRead: (value) => {/* change value after serialization but before setting store to return value*/},
-  beforeWrite: (value) => {/* change value after writing to store, but before writing return value to local storage*/},
+  beforeRead: (value, cancel) => {/* change value after serialization but before setting store to return value. Return cancel to cancel the operation*/},
+  beforeWrite: (value, cancel) => {/* change value after writing to store, but before writing return value to local storage. Return cancel to cancel the operation*/},
 })
 ```
 

@@ -40,9 +40,9 @@ jobs:
 
       - run: pnpm install
       - run: pnpm run lint
-      - run: pnpm publint
       - run: pnpm run test
       - run: pnpm run build
+      - run: pnpm publint
       - name: Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

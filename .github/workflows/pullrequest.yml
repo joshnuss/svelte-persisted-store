@@ -47,5 +47,6 @@ jobs:
 
     - run: pnpm install
     - run: pnpm run lint
+    - run: pnpm publint
     - run: pnpm test
     - run: pnpm run build

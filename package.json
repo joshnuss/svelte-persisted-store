@@ -37,6 +37,7 @@
     "codecov": "^3.8.3",
     "eslint": "^8.57.0",
     "jsdom": "^24.0.0",
+    "publint": "^0.2.8",
     "rollup": "^3.28.1",
     "rollup-plugin-svelte": "^7.1.0",
     "semantic-release": "23.0.8",

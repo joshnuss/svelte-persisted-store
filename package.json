@@ -2,6 +2,7 @@
   "name": "svelte-persisted-store",
   "version": "0.0.0-development",
   "license": "MIT",
+  "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",

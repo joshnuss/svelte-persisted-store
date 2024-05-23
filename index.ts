@@ -28,8 +28,8 @@ export interface Options<StoreType, SerializerType> {
   onError?: (e: unknown) => void
   onWriteError?: (e: unknown) => void
   onParseError?: (newValue: string | null, e: unknown) => void
-  beforeRead?: <S extends symbol>(val: SerializerType, cancel: S) => StoreType | S
-  beforeWrite?: <S extends symbol>(val: StoreType, cancel: S) => SerializerType | S
+  beforeRead?: (val: SerializerType) => StoreType
+  beforeWrite?: (val: StoreType) => SerializerType
 }
 
 function getStorage(type: StorageType) {
@@ -57,9 +57,7 @@ export function persisted<StoreType, SerializerType>(key: string, initialValue: 
   const storage = browser ? getStorage(storageType) : null
 
   function updateStorage(key: string, value: StoreType) {
-    const cancel = Symbol("cancel")
-    const newVal = beforeWrite(value, cancel)
-    if (newVal === cancel) return
+    const newVal = beforeWrite(value)
 
     try {
       storage?.setItem(key, serializer.stringify(newVal))
@@ -82,9 +80,7 @@ export function persisted<StoreType, SerializerType>(key: string, initialValue: 
     const serialized = serialize(json)
     if (serialized == null) return initialValue
 
-    const cancel = Symbol("cancel")
-    const newVal = beforeRead(serialized, cancel)
-    if (newVal === cancel) return initialValue
+    const newVal = beforeRead(serialized)
     return newVal
   }
 
@@ -101,9 +97,7 @@ export function persisted<StoreType, SerializerType>(key: string, initialValue: 
               onParseError(event.newValue, e)
               return
             }
-            const cancel = Symbol("cancel")
-            const processedVal = beforeRead(newVal, cancel)
-            if (processedVal === cancel) return
+            const processedVal = beforeRead(newVal)
 
             set(processedVal)
           }

@@ -37,11 +37,11 @@ function getStorage(type: StorageType) {
 }
 
 /** @deprecated `writable()` has been renamed to `persisted()` */
-export function writable<StoreType, SerializerType>(key: string, initialValue: StoreType, options?: Options<StoreType, SerializerType>): Writable<StoreType> {
+export function writable<StoreType, SerializerType = StoreType>(key: string, initialValue: StoreType, options?: Options<StoreType, SerializerType>): Writable<StoreType> {
   console.warn("writable() has been deprecated. Please use persisted() instead.\n\nchange:\n\nimport { writable } from 'svelte-persisted-store'\n\nto:\n\nimport { persisted } from 'svelte-persisted-store'")
   return persisted<StoreType, SerializerType>(key, initialValue, options)
 }
-export function persisted<StoreType, SerializerType>(key: string, initialValue: StoreType, options?: Options<StoreType, SerializerType>): Writable<StoreType> {
+export function persisted<StoreType, SerializerType = StoreType>(key: string, initialValue: StoreType, options?: Options<StoreType, SerializerType>): Writable<StoreType> {
   if (options?.onError) console.warn("onError has been deprecated. Please use onWriteError instead")
 
   const serializer = options?.serializer ?? JSON

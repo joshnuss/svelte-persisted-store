@@ -21,13 +21,15 @@ export interface Serializer<T> {
 
 export type StorageType = 'local' | 'session'
 
-export interface Options<T> {
-  serializer?: Serializer<T>
+export interface Options<StoreType, SerializerType> {
+  serializer?: Serializer<SerializerType>
   storage?: StorageType,
   syncTabs?: boolean,
   onError?: (e: unknown) => void
   onWriteError?: (e: unknown) => void
   onParseError?: (newValue: string | null, e: unknown) => void
+  beforeRead?: (val: SerializerType) => StoreType
+  beforeWrite?: (val: StoreType) => SerializerType
 }
 
 function getStorage(type: StorageType) {
@@ -35,11 +37,11 @@ function getStorage(type: StorageType) {
 }
 
 /** @deprecated `writable()` has been renamed to `persisted()` */
-export function writable<T>(key: string, initialValue: T, options?: Options<T>): Writable<T> {
+export function writable<StoreType, SerializerType = StoreType>(key: string, initialValue: StoreType, options?: Options<StoreType, SerializerType>): Writable<StoreType> {
   console.warn("writable() has been deprecated. Please use persisted() instead.\n\nchange:\n\nimport { writable } from 'svelte-persisted-store'\n\nto:\n\nimport { persisted } from 'svelte-persisted-store'")
-  return persisted<T>(key, initialValue, options)
+  return persisted<StoreType, SerializerType>(key, initialValue, options)
 }
-export function persisted<T>(key: string, initialValue: T, options?: Options<T>): Writable<T> {
+export function persisted<StoreType, SerializerType = StoreType>(key: string, initialValue: StoreType, options?: Options<StoreType, SerializerType>): Writable<StoreType> {
   if (options?.onError) console.warn("onError has been deprecated. Please use onWriteError instead")
 
   const serializer = options?.serializer ?? JSON
@@ -47,29 +49,39 @@ export function persisted<T>(key: string, initialValue: T, options?: Options<T>)
   const syncTabs = options?.syncTabs ?? true
   const onWriteError = options?.onWriteError ?? options?.onError ?? ((e) => console.error(`Error when writing value from persisted store "${key}" to ${storageType}`, e))
   const onParseError = options?.onParseError ?? ((newVal, e) => console.error(`Error when parsing ${newVal ? '"' + newVal + '"' : "value"} from persisted store "${key}"`, e))
+
+  const beforeRead = options?.beforeRead ?? ((val) => val as unknown as StoreType)
+  const beforeWrite = options?.beforeWrite ?? ((val) => val as unknown as SerializerType)
+
   const browser = typeof (window) !== 'undefined' && typeof (document) !== 'undefined'
   const storage = browser ? getStorage(storageType) : null
 
-  function updateStorage(key: string, value: T) {
+  function updateStorage(key: string, value: StoreType) {
+    const newVal = beforeWrite(value)
+
     try {
-      storage?.setItem(key, serializer.stringify(value))
+      storage?.setItem(key, serializer.stringify(newVal))
     } catch (e) {
       onWriteError(e)
     }
   }
 
-  function maybeLoadInitial(): T {
-    const json = storage?.getItem(key)
-
-    if (json) {
+  function maybeLoadInitial(): StoreType {
+    function serialize(json: any) {
       try {
-        return <T>serializer.parse(json)
+        return <SerializerType>serializer.parse(json)
       } catch (e) {
         onParseError(json, e)
       }
     }
+    const json = storage?.getItem(key)
+    if (json == null) return initialValue
 
-    return initialValue
+    const serialized = serialize(json)
+    if (serialized == null) return initialValue
+
+    const newVal = beforeRead(serialized)
+    return newVal
   }
 
   if (!stores[storageType][key]) {
@@ -77,15 +89,17 @@ export function persisted<T>(key: string, initialValue: T, options?: Options<T>)
     const store = internal(initial, (set) => {
       if (browser && storageType == 'local' && syncTabs) {
         const handleStorage = (event: StorageEvent) => {
-          if (event.key === key) {
+          if (event.key === key && event.newValue) {
             let newVal: any
             try {
-              newVal = event.newValue ? serializer.parse(event.newValue) : null
+              newVal = serializer.parse(event.newValue)
             } catch (e) {
               onParseError(event.newValue, e)
               return
             }
-            set(newVal)
+            const processedVal = beforeRead(newVal)
+
+            set(processedVal)
           }
         }
 
@@ -98,11 +112,11 @@ export function persisted<T>(key: string, initialValue: T, options?: Options<T>)
     const { subscribe, set } = store
 
     stores[storageType][key] = {
-      set(value: T) {
+      set(value: StoreType) {
         set(value)
         updateStorage(key, value)
       },
-      update(callback: Updater<T>) {
+      update(callback: Updater<StoreType>) {
         return store.update((last) => {
           const value = callback(last)
 

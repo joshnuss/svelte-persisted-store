@@ -35,6 +35,7 @@ import { preferences } from './stores'
 preferences.subscribe(...) // subscribe to changes
 preferences.update(...) // update value
 preferences.set(...) // set value
+preferences.reset() // reset to initial value
 get(preferences) // read value
 $preferences // read value with automatic subscription
 ```

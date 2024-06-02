@@ -1,7 +1,11 @@
 import { writable as internal, type Writable } from 'svelte/store'
 
 declare type Updater<T> = (value: T) => T;
-declare type StoreDict<T> = { [key: string]: Writable<T> }
+declare type StoreDict<T> = { [key: string]: Persisted<T> }
+
+interface Persisted<T> extends Writable<T> {
+  reset: () => void
+}
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 interface Stores {
@@ -37,11 +41,11 @@ function getStorage(type: StorageType) {
 }
 
 /** @deprecated `writable()` has been renamed to `persisted()` */
-export function writable<StoreType, SerializerType = StoreType>(key: string, initialValue: StoreType, options?: Options<StoreType, SerializerType>): Writable<StoreType> {
+export function writable<StoreType, SerializerType = StoreType>(key: string, initialValue: StoreType, options?: Options<StoreType, SerializerType>): Persisted<StoreType> {
   console.warn("writable() has been deprecated. Please use persisted() instead.\n\nchange:\n\nimport { writable } from 'svelte-persisted-store'\n\nto:\n\nimport { persisted } from 'svelte-persisted-store'")
   return persisted<StoreType, SerializerType>(key, initialValue, options)
 }
-export function persisted<StoreType, SerializerType = StoreType>(key: string, initialValue: StoreType, options?: Options<StoreType, SerializerType>): Writable<StoreType> {
+export function persisted<StoreType, SerializerType = StoreType>(key: string, initialValue: StoreType, options?: Options<StoreType, SerializerType>): Persisted<StoreType> {
   if (options?.onError) console.warn("onError has been deprecated. Please use onWriteError instead")
 
   const serializer = options?.serializer ?? JSON
@@ -125,9 +129,11 @@ export function persisted<StoreType, SerializerType = StoreType>(key: string, in
           return value
         })
       },
+      reset() {
+        this.set(initialValue)
+      },
       subscribe
     }
   }
-
   return stores[storageType][key]
 }

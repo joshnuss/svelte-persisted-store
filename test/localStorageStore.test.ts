@@ -86,6 +86,18 @@ describe('persisted()', () => {
     })
   })
 
+  describe('reset', () => {
+    it('resets to initial value', () => {
+      const store = persisted('myKey14', 123);
+      store.set(456);
+      store.reset();
+      const value = get(store);
+
+      expect(value).toEqual(123);
+      expect(localStorage.myKey14).toEqual('123');
+      });
+    });
+
   describe('subscribe()', () => {
     it('publishes updates', () => {
       const store = persisted('myKey7', 123)

@@ -299,7 +299,7 @@ describe('persisted()', () => {
     expect(await localforage.getItem("myKey11")).toEqual(serializer.stringify(new Set([1, 2, 3, 4])))
   })
 
-  it('lets you switch storage type', () => {
+  it('lets you switch storage type to sessionStorage', async () => {
     vi.spyOn(Object.getPrototypeOf(window.sessionStorage), 'setItem')
     Object.setPrototypeOf(window.sessionStorage.setItem, vi.fn())
 
@@ -313,4 +313,22 @@ describe('persisted()', () => {
 
     expect(window.sessionStorage.setItem).toHaveBeenCalled()
   })
+
+  it("lets you switch storage type to indexedDB", async () => {
+    /* Testing direct calls to the mock IndexedDB is not feasible due to the timing
+     of spy setup and localforage import. 
+     Localforage's internal calls to IndexedDB occur before the spy can be set up. 
+     As a workaround, verify if localforage's setDriver method was called with the correct arguments. */
+    const setDriverSpy = vi.spyOn(localforage, "setDriver");
+
+    const value = "foo";
+
+    const store = await persisted("myKey12", value, {
+      storage: "indexedDB",
+    });
+
+    await store.set("bar");
+
+    expect(setDriverSpy).toHaveBeenCalledWith(localforage.INDEXEDDB);
+  });
 })

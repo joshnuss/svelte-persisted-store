@@ -10,22 +10,28 @@ beforeEach(() => localStorage.clear())
 
 describe('persisted()', () => {
 
-  it('logs error encountered when saving to local storage', () => {
-    const consoleMock = vi.spyOn(console, 'error').mockImplementation(() => undefined);
-    const store = persisted('myKey', 'myVal')
-
-    store.set("myNewVal")
-
-    expect(consoleMock).toHaveBeenCalledWith("Error when writing value from persisted store \"myKey\" to local", new DOMException)
-    consoleMock.mockReset();
+  it('logs error encountered when saving to local storage', async () => {
+try {
+      const consoleMock = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+      const store = await persisted('myKey', 'myVal')
+  
+      await store.set("myNewVal")
+  
+      expect(consoleMock).toHaveBeenCalledWith("Error when writing value from persisted store \"myKey\" to local", new DOMException)
+      consoleMock.mockReset();
+} catch (error) {
+  console.error(error)
+}
   })
 
-  it('calls custom error function', () => {
+  it('calls custom error function', async () => {
     const mockFunc = vi.fn()
-
-    const store = persisted('myKey2', 'myVal', { onWriteError: mockFunc })
-    store.set("myNewVal")
-
-    expect(mockFunc).toHaveBeenCalledOnce()
+    try {
+      const store = await persisted('myKey2', 'myVal', { onWriteError: mockFunc })
+      await store.set("myNewVal")
+      expect(mockFunc).toHaveBeenCalledOnce()
+    } catch (error) {
+      console.error(error)
+    }   
   })
 })

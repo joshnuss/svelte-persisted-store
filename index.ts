@@ -1,139 +1,126 @@
-import { writable as internal, type Writable } from 'svelte/store'
-
-declare type Updater<T> = (value: T) => T;
-declare type StoreDict<T> = { [key: string]: Persisted<T> }
-
-interface Persisted<T> extends Writable<T> {
-  reset: () => void
-}
-
-/* eslint-disable @typescript-eslint/no-explicit-any */
-interface Stores {
-  local: StoreDict<any>,
-  session: StoreDict<any>,
+import { get, writable as internal } from "svelte/store";
+import indexedDB from "./drivers/idb";
+import { AsyncPersisted, Persisted, Stores } from "./types/store";
+import { Options, DeprecatedOptions } from "./types/options";
+import createState from "./state";
+if (process.env.NODE_ENV === "test" || process.env.NODE_ENV === "development") {
+  // structured-clone is not supported in jsdom
+  require("core-js/stable/structured-clone");
+  require("fake-indexeddb/auto");
 }
 
 const stores: Stores = {
   local: {},
-  session: {}
+  session: {},
+  indexedDB: {},
+};
+
+/**
+ * @deprecated `writable()` has been renamed to `persisted()`
+ * @param {string} key - The key for the store.
+ * @param {StoreType} initialValue - The initial value for the store.
+ * @param {Options<StoreType, SerializerType>} options - The options for the store.
+ * @returns {Persisted<StoreType>} - The persisted store.
+ */
+export function writable<StoreType, SerializerType = StoreType>(
+  key: string,
+  initialValue: StoreType,
+  options?: Options<StoreType, SerializerType>
+): Persisted<StoreType> {
+  console.warn(
+    "writable() has been deprecated. Please use localState() instead.\n\nchange:\n\nimport { writable } from 'svelte-persisted-store'\n\nto:\n\nimport { persisted } from 'svelte-persisted-store'"
+  );
+  return persisted<StoreType, SerializerType>(key, initialValue, options);
 }
 
-export interface Serializer<T> {
-  parse(text: string): T
-  stringify(object: T): string
-}
-
-export type StorageType = 'local' | 'session'
-
-export interface Options<StoreType, SerializerType> {
-  serializer?: Serializer<SerializerType>
-  storage?: StorageType,
-  syncTabs?: boolean,
-  onError?: (e: unknown) => void
-  onWriteError?: (e: unknown) => void
-  onParseError?: (newValue: string | null, e: unknown) => void
-  beforeRead?: (val: SerializerType) => StoreType
-  beforeWrite?: (val: StoreType) => SerializerType
-}
-
-function getStorage(type: StorageType) {
-  return type === 'local' ? localStorage : sessionStorage
-}
-
-/** @deprecated `writable()` has been renamed to `persisted()` */
-export function writable<StoreType, SerializerType = StoreType>(key: string, initialValue: StoreType, options?: Options<StoreType, SerializerType>): Persisted<StoreType> {
-  console.warn("writable() has been deprecated. Please use persisted() instead.\n\nchange:\n\nimport { writable } from 'svelte-persisted-store'\n\nto:\n\nimport { persisted } from 'svelte-persisted-store'")
-  return persisted<StoreType, SerializerType>(key, initialValue, options)
-}
-export function persisted<StoreType, SerializerType = StoreType>(key: string, initialValue: StoreType, options?: Options<StoreType, SerializerType>): Persisted<StoreType> {
-  if (options?.onError) console.warn("onError has been deprecated. Please use onWriteError instead")
-
-  const serializer = options?.serializer ?? JSON
-  const storageType = options?.storage ?? 'local'
-  const syncTabs = options?.syncTabs ?? true
-  const onWriteError = options?.onWriteError ?? options?.onError ?? ((e) => console.error(`Error when writing value from persisted store "${key}" to ${storageType}`, e))
-  const onParseError = options?.onParseError ?? ((newVal, e) => console.error(`Error when parsing ${newVal ? '"' + newVal + '"' : "value"} from persisted store "${key}"`, e))
-
-  const beforeRead = options?.beforeRead ?? ((val) => val as unknown as StoreType)
-  const beforeWrite = options?.beforeWrite ?? ((val) => val as unknown as SerializerType)
-
-  const browser = typeof (window) !== 'undefined' && typeof (document) !== 'undefined'
-  const storage = browser ? getStorage(storageType) : null
-
-  function updateStorage(key: string, value: StoreType) {
-    const newVal = beforeWrite(value)
-
-    try {
-      storage?.setItem(key, serializer.stringify(newVal))
-    } catch (e) {
-      onWriteError(e)
-    }
+/**
+ * @deprecated `persisted()` has been deprecated.
+ * @param {string} key - The key for the store.
+ * @param {StoreType} initialValue - The initial value for the store.
+ * @param {DeprecatedOptions<StoreType, SerializerType>} options - The options for the store.
+ * @returns {Persisted<StoreType>} - The persisted store.
+ */
+export function persisted<StoreType, SerializerType = StoreType>(
+  key: string,
+  initialValue: StoreType,
+  options?: DeprecatedOptions<StoreType, SerializerType>
+): Persisted<StoreType> {
+  console.warn(
+    "persisted() has been deprecated. Please use localState() or sessionState()) instead."
+  );
+  const storageType = options?.storage || "local";
+  switch (storageType) {
+    case "local":
+      return localState(key, initialValue, options);
+    case "session":
+      return sessionState(key, initialValue, options);
+    default:
+      throw new Error("Invalid storage type. Please use 'local' or 'session'");
   }
+}
+/**
+ * Creates a local state.
+ * @param {string} key - The key for the store.
+ * @param {StoreType} initialValue - The initial value for the store.
+ * @param {Options<StoreType, SerializerType>} options - The options for the store.
+ * @returns {Persisted<StoreType>} - The persisted store.
+ */
+export function localState<StoreType, SerializerType = StoreType>(
+  key: string,
+  initialValue: StoreType,
+  options?: Options<StoreType, SerializerType>
+): Persisted<StoreType> {
+  return createState(key, initialValue, stores, {
+    ...options,
+    storage: "local",
+  });
+}
+/**
+ * Creates a session state.
+ * @param {string} key - The key for the store.
+ * @param {StoreType} initialValue - The initial value for the store.
+ * @param {Options<StoreType, SerializerType>} options - The options for the store.
+ * @returns {Persisted<StoreType>} - The persisted store.
+ */
+export function sessionState<StoreType, SerializerType = StoreType>(
+  key: string,
+  initialValue: StoreType,
+  options?: Options<StoreType, SerializerType>
+): Persisted<StoreType> {
+  return createState(key, initialValue, stores, {
+    ...options,
+    storage: "session",
+  });
+}
+/**
+ * Creates an IndexedDB state.
+ * @param {string} key - The key for the store.
+ * @param {T} initialValue - The initial value for the store.
+ * @returns {Promise<Persisted<T> | AsyncPersisted<T>>} - The persisted store.
+ */
+export async function indexedDBState<T>(
+  key: string,
+  initialValue: T
+): Promise<Persisted<T> | AsyncPersisted<T>> {
+  const store = internal(initialValue);
+  const { subscribe } = store;
+  const storage = new indexedDB();
 
-  function maybeLoadInitial(): StoreType {
-    function serialize(json: any) {
-      try {
-        return <SerializerType>serializer.parse(json)
-      } catch (e) {
-        onParseError(json, e)
-      }
-    }
-    const json = storage?.getItem(key)
-    if (json == null) return initialValue
+  stores["indexedDB"][key] = {
+    async set(value: T): Promise<void> {
+      store.set(value);
+      await storage.setItem(key, value);
+    },
 
-    const serialized = serialize(json)
-    if (serialized == null) return initialValue
+    async update(updater: (value: T) => T): Promise<void> {
+      const updatedValue = updater(get(store));
+      await this.set(updatedValue);
+    },
 
-    const newVal = beforeRead(serialized)
-    return newVal
-  }
-
-  if (!stores[storageType][key]) {
-    const initial = maybeLoadInitial()
-    const store = internal(initial, (set) => {
-      if (browser && storageType == 'local' && syncTabs) {
-        const handleStorage = (event: StorageEvent) => {
-          if (event.key === key && event.newValue) {
-            let newVal: any
-            try {
-              newVal = serializer.parse(event.newValue)
-            } catch (e) {
-              onParseError(event.newValue, e)
-              return
-            }
-            const processedVal = beforeRead(newVal)
-
-            set(processedVal)
-          }
-        }
-
-        window.addEventListener("storage", handleStorage)
-
-        return () => window.removeEventListener("storage", handleStorage)
-      }
-    })
-
-    const { subscribe, set } = store
-
-    stores[storageType][key] = {
-      set(value: StoreType) {
-        set(value)
-        updateStorage(key, value)
-      },
-      update(callback: Updater<StoreType>) {
-        return store.update((last) => {
-          const value = callback(last)
-
-          updateStorage(key, value)
-
-          return value
-        })
-      },
-      reset() {
-        this.set(initialValue)
-      },
-      subscribe
-    }
-  }
-  return stores[storageType][key]
+    async reset(): Promise<void> {
+      this.set(initialValue);
+    },
+    subscribe,
+  };
+  return stores["indexedDB"][key];
 }

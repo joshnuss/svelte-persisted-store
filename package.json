@@ -6,8 +6,8 @@
   "main": "dist/index.js",
   "exports": {
     ".": {
-     "types": "./dist/index.d.ts",
-     "default": "./dist/index.js"
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
     }
   },
   "types": "dist/index.d.ts",
@@ -30,11 +30,15 @@
   "devDependencies": {
     "@babel/core": "^7.24.6",
     "@babel/preset-env": "^7.24.5",
+    "@types/core-js": "^2.5.8",
+    "@types/node": "^20.13.0",
     "@typescript-eslint/eslint-plugin": "^5.62.0",
     "@typescript-eslint/parser": "^5.62.0",
     "@vitest/coverage-v8": "^1.6.0",
     "codecov": "^3.8.3",
+    "core-js": "^3.37.1",
     "eslint": "^8.57.0",
+    "fake-indexeddb": "^6.0.0",
     "jsdom": "^24.0.0",
     "publint": "^0.2.8",
     "rollup": "^4.18.0",
@@ -53,5 +57,6 @@
   ],
   "files": [
     "dist"
-  ]
+  ],
+  "packageManager": "pnpm@9.0.6+sha1.648f6014eb363abb36618f2ba59282a9eeb3e879"
 }

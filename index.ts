@@ -15,19 +15,31 @@ const stores: Stores = {
   indexedDB: {},
 };
 
-/** @deprecated `writable()` has been renamed to `localState(())` */
+/**
+ * @deprecated `writable()` has been renamed to `persisted()`
+ * @param {string} key - The key for the store.
+ * @param {StoreType} initialValue - The initial value for the store.
+ * @param {Options<StoreType, SerializerType>} options - The options for the store.
+ * @returns {Persisted<StoreType>} - The persisted store.
+ */
 export function writable<StoreType, SerializerType = StoreType>(
   key: string,
   initialValue: StoreType,
   options?: Options<StoreType, SerializerType>
 ): Persisted<StoreType> {
   console.warn(
-    "writable() has been deprecated. Please use localState(()) instead.\n\nchange:\n\nimport { writable } from 'svelte-persisted-store-idb'\n\nto:\n\nimport { persisted } from 'svelte-persisted-store-idb'"
+    "writable() has been deprecated. Please use localState() instead.\n\nchange:\n\nimport { writable } from 'svelte-persisted-store'\n\nto:\n\nimport { persisted } from 'svelte-persisted-store'"
   );
   return persisted<StoreType, SerializerType>(key, initialValue, options);
 }
 
-/** @deprecated `persisted()` has been deprecated. */
+/**
+ * @deprecated `persisted()` has been deprecated.
+ * @param {string} key - The key for the store.
+ * @param {StoreType} initialValue - The initial value for the store.
+ * @param {DeprecatedOptions<StoreType, SerializerType>} options - The options for the store.
+ * @returns {Persisted<StoreType>} - The persisted store.
+ */
 export function persisted<StoreType, SerializerType = StoreType>(
   key: string,
   initialValue: StoreType,
@@ -46,7 +58,13 @@ export function persisted<StoreType, SerializerType = StoreType>(
       throw new Error("Invalid storage type. Please use 'local' or 'session'");
   }
 }
-
+/**
+ * Creates a local state.
+ * @param {string} key - The key for the store.
+ * @param {StoreType} initialValue - The initial value for the store.
+ * @param {Options<StoreType, SerializerType>} options - The options for the store.
+ * @returns {Persisted<StoreType>} - The persisted store.
+ */
 export function localState<StoreType, SerializerType = StoreType>(
   key: string,
   initialValue: StoreType,
@@ -57,7 +75,13 @@ export function localState<StoreType, SerializerType = StoreType>(
     storage: "local",
   });
 }
-
+/**
+ * Creates a session state.
+ * @param {string} key - The key for the store.
+ * @param {StoreType} initialValue - The initial value for the store.
+ * @param {Options<StoreType, SerializerType>} options - The options for the store.
+ * @returns {Persisted<StoreType>} - The persisted store.
+ */
 export function sessionState<StoreType, SerializerType = StoreType>(
   key: string,
   initialValue: StoreType,
@@ -68,7 +92,12 @@ export function sessionState<StoreType, SerializerType = StoreType>(
     storage: "session",
   });
 }
-
+/**
+ * Creates an IndexedDB state.
+ * @param {string} key - The key for the store.
+ * @param {T} initialValue - The initial value for the store.
+ * @returns {Promise<Persisted<T> | AsyncPersisted<T>>} - The persisted store.
+ */
 export async function indexedDBState<T>(
   key: string,
   initialValue: T

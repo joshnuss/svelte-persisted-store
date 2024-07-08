@@ -3,7 +3,7 @@ import { writable as internal, type Writable } from 'svelte/store'
 declare type Updater<T> = (value: T) => T;
 declare type StoreDict<T> = { [key: string]: Persisted<T> }
 
-interface Persisted<T> extends Writable<T> {
+export interface Persisted<T> extends Writable<T> {
   reset: () => void
 }
 

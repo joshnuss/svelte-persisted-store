@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import { persisted, writable } from '../index'
 import { get } from 'svelte/store'
 import { expect, vi, beforeEach, describe, test, it } from 'vitest'

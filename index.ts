@@ -48,16 +48,20 @@ export function writable<StoreType, SerializerType = StoreType>(key: string, ini
 export function persisted<StoreType, SerializerType = StoreType>(key: string, initialValue: StoreType, options?: Options<StoreType, SerializerType>): Persisted<StoreType> {
   if (options?.onError) console.warn("onError has been deprecated. Please use onWriteError instead")
 
-  const serializer = options?.serializer ?? JSON
   const storageType = options?.storage ?? 'local'
+  const browser = typeof (window) !== 'undefined' && typeof (document) !== 'undefined'
+
+  if (browser && stores[storageType][key]) {
+    return stores[storageType][key]
+  }
+
+  const serializer = options?.serializer ?? JSON
   const syncTabs = options?.syncTabs ?? true
   const onWriteError = options?.onWriteError ?? options?.onError ?? ((e) => console.error(`Error when writing value from persisted store "${key}" to ${storageType}`, e))
   const onParseError = options?.onParseError ?? ((newVal, e) => console.error(`Error when parsing ${newVal ? '"' + newVal + '"' : "value"} from persisted store "${key}"`, e))
-
   const beforeRead = options?.beforeRead ?? ((val) => val as unknown as StoreType)
   const beforeWrite = options?.beforeWrite ?? ((val) => val as unknown as SerializerType)
 
-  const browser = typeof (window) !== 'undefined' && typeof (document) !== 'undefined'
   const storage = browser ? getStorage(storageType) : null
 
   function updateStorage(key: string, value: StoreType) {
@@ -88,52 +92,54 @@ export function persisted<StoreType, SerializerType = StoreType>(key: string, in
     return newVal
   }
 
-  if (!stores[storageType][key]) {
-    const initial = maybeLoadInitial()
-    const store = internal(initial, (set) => {
-      if (browser && storageType == 'local' && syncTabs) {
-        const handleStorage = (event: StorageEvent) => {
-          if (event.key === key && event.newValue) {
-            let newVal: any
-            try {
-              newVal = serializer.parse(event.newValue)
-            } catch (e) {
-              onParseError(event.newValue, e)
-              return
-            }
-            const processedVal = beforeRead(newVal)
-
-            set(processedVal)
+  const initial = maybeLoadInitial()
+  const store = internal(initial, (set) => {
+    if (browser && storageType == 'local' && syncTabs) {
+      const handleStorage = (event: StorageEvent) => {
+        if (event.key === key && event.newValue) {
+          let newVal: any
+          try {
+            newVal = serializer.parse(event.newValue)
+          } catch (e) {
+            onParseError(event.newValue, e)
+            return
           }
+          const processedVal = beforeRead(newVal)
+
+          set(processedVal)
         }
-
-        window.addEventListener("storage", handleStorage)
-
-        return () => window.removeEventListener("storage", handleStorage)
       }
-    })
 
-    const { subscribe, set } = store
+      window.addEventListener("storage", handleStorage)
 
-    stores[storageType][key] = {
-      set(value: StoreType) {
-        set(value)
-        updateStorage(key, value)
-      },
-      update(callback: Updater<StoreType>) {
-        return store.update((last) => {
-          const value = callback(last)
-
-          updateStorage(key, value)
-
-          return value
-        })
-      },
-      reset() {
-        this.set(initialValue)
-      },
-      subscribe
+      return () => window.removeEventListener("storage", handleStorage)
     }
+  })
+
+  const { subscribe, set } = store
+  const persistedStore = {
+    set(value: StoreType) {
+      set(value)
+      updateStorage(key, value)
+    },
+    update(callback: Updater<StoreType>) {
+      return store.update((last) => {
+        const value = callback(last)
+
+        updateStorage(key, value)
+
+        return value
+      })
+    },
+    reset() {
+      this.set(initialValue)
+    },
+    subscribe
   }
-  return stores[storageType][key]
+
+  if (browser) {
+    stores[storageType][key] = persistedStore
+  }
+
+  return persistedStore
 }

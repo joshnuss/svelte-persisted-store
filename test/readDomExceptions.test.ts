@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import { persisted } from '../index'
 import { expect, vi, beforeEach, describe, it } from 'vitest'
 

@@ -4,6 +4,12 @@
 
 A Svelte store that persists to local storage. Can sync changes across browser tabs.
 
+## Used by
+
+<a href="https://github.com/joshnuss/svelte-persisted-store/network/dependents">
+  <img src="https://dependents.info/joshnuss/svelte-persisted-store/image.svg" />
+</a>
+
 ## Installation
 
 ```bash
